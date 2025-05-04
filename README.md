@@ -1,36 +1,31 @@
 # PROJECT SETUP
-  - Create a simple java project in IntelliJ with Maven named "NEMS".
-# Backend
-    - Right-Click on the project and select New → Module
-    - Select SpringBoot and enter the following details:
-        - Type: Maven
-         - GroupId: com.car
-         - Name: backend
-        - Java Version: 21
-         - JDK: 21
-     - Click Next and choose the following dependencies:
-         - Spring Web
-         - Spring Data JPA
-         - Spring Boot DevTools
-         - Lombok
-         - PostgreSQL Driver
-         - Spring Security
-     - And finally, click Finish.
+  - Make sure you have the following installed:
+    - Node.js (23.11.0) (run `node -v` in terminal to check)
+    - JDK 21 and Java 21 (run `java -version` in terminal to check)   
+  - If missing: [Node.js](https://nodejs.org/dist/v23.11.0/node-v23.11.0-x64.msi) | [JDK 21](https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.msi)
+  
 
-# Frontend
-    - First, install [Node.js](https://nodejs.org/dist/v23.11.0/node-v23.11.0-x64.msi).
-        - (uncheck the Automatically install the necessary tools option during installation)
-    - Restart IntelliJ.
-
-    - Right-Click on the project and select New → Module
-    - Select Vite and enter the following details:
-        - Name: ui
-        - Node interpreter: 23.11.0
-        - Vite: npx create-vite (6.4.1)
-        - Template: React (with TypeScript Checked)
-    - There should be a pop-up at the bottom right corner of the screen asking to run npm install.
-        - Click on it to install the necessary packages.
-
-    - Now, we need to install tailwindcss
-        - cd to the ui directory then run the following command
-          `npm install tailwindcss @tailwindcss/vite`
+  
+  - Clone the repository in optimal directory:
+    ```bash
+    git clone https://github.com/SkinnyLadd/NEMS.git
+    ```
+    
+  - Navigate to the ui directory:
+    ```bash
+    cd NEMS/ui
+    ```
+  - Install the dependencies:
+    ```bash
+    npm install
+    ```
+  
+  - Open the Project Folder (NEMS) in IntelliJ IDEA
+  - IntelliJ should automatically detect the maven module and download dependencies
+  - If it doesn't, you can manually import the maven module by
+    - opening the `pom.xml` file in the backend directory
+    - right-clicking on the file and selecting "Add as Maven Project"
+  
+  That should be all, try building the backend module and running npm run dev in the ui directory through the terminal.  
+  (backend will prob give a build error for now, will have to setup the database (pain) for that to fully work)
+    

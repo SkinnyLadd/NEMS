@@ -272,4 +272,6 @@ const calendarEvents = [
         location: "Auditorium",
         category: "Academic",
     },
+
 ]
+

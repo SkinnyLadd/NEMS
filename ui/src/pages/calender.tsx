@@ -3,10 +3,12 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/calender.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, List, CalendarDays } from "lucide-react"
+
+
 
 export default function CalendarPage() {
     const [date, setDate] = useState<Date | undefined>(new Date())
@@ -92,39 +94,7 @@ export default function CalendarPage() {
                                 selected={date}
                                 onSelect={setDate}
                                 className="rounded-md border"
-                                components={{
-                                    DayContent: (props) => {
-                                        const day = props.date.getDate()
-                                        const month = props.date.getMonth()
-                                        const year = props.date.getFullYear()
 
-                                        // Find events for this day
-                                        const dayEvents = calendarEvents.filter((event) => {
-                                            const eventDate = new Date(event.date)
-                                            return (
-                                                eventDate.getDate() === day &&
-                                                eventDate.getMonth() === month &&
-                                                eventDate.getFullYear() === year
-                                            )
-                                        })
-
-                                        return (
-                                            <div className="flex flex-col h-full min-h-[80px] p-1">
-                                                <div className="text-right">{day}</div>
-                                                <div className="flex flex-col gap-1 mt-1">
-                                                    {dayEvents.map((event, i) => (
-                                                        <div
-                                                            key={i}
-                                                            className={`text-xs truncate rounded px-1 py-0.5 ${getCategoryColor(event.category)}`}
-                                                        >
-                                                            {event.name}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )
-                                    },
-                                }}
                             />
                         </div>
                     )}
@@ -189,25 +159,6 @@ export default function CalendarPage() {
     )
 }
 
-// Helper functions
-function getCategoryColor(category: string) {
-    switch (category.toLowerCase()) {
-        case "academic":
-            return "bg-blue-100 text-blue-800"
-        case "sports":
-            return "bg-green-100 text-green-800"
-        case "cultural":
-            return "bg-purple-100 text-purple-800"
-        case "workshop":
-            return "bg-yellow-100 text-yellow-800"
-        case "career":
-            return "bg-orange-100 text-orange-800"
-        case "technical":
-            return "bg-cyan-100 text-cyan-800"
-        default:
-            return "bg-gray-100 text-gray-800"
-    }
-}
 
 function getCategoryBadgeColor(category: string) {
     switch (category.toLowerCase()) {

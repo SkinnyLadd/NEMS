@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/NEMS
+    url: jdbc:postgresql://db.xcqvipaazevcqbclwtdx.supabase.co:5432/postgres?sslmode=require&currentSchema=nems
     username: postgres
-    password: bgne
+    password: bgne123
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:

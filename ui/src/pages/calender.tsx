@@ -2,13 +2,58 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar } from "@/components/ui/calender.tsx"
+import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, List, CalendarDays } from "lucide-react"
+import { List, CalendarDays, Calendar } from "lucide-react"
 
+import * as React from "react"
+import { DayPicker } from "react-day-picker"
 
+import { cn } from "@/lib/utils"
+
+export type CalendarProps = React.ComponentProps<typeof DayPicker>
+
+export function CalendarComponent({
+                                      className,
+                                      classNames,
+                                      showOutsideDays = false,
+                                      ...props
+                                  }: CalendarProps) {
+    return (
+        <DayPicker
+            showOutsideDays={showOutsideDays}
+            numberOfMonths={1}
+            className={cn("p-3", className)}
+            classNames={{
+                head: "hidden", // Hide weekday headers
+                head_row: "hidden",
+                nav: "hidden", // Hide nav arrows
+                caption: "hidden", // Hide month caption
+                caption_label: "hidden",
+                months: "flex flex-col",
+                month: "space-y-4",
+                table: "w-full border-collapse space-y-1",
+                row: "flex w-full mt-2",
+                cell: "text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+                day: cn(
+                    "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                    "hover:bg-accent hover:text-accent-foreground rounded-md"
+                ),
+                day_selected:
+                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                day_today: "border border-primary",
+                day_outside: "text-muted-foreground opacity-50",
+                day_disabled: "text-muted-foreground opacity-50",
+                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                day_hidden: "invisible",
+                ...classNames,
+            }}
+            showCaption={false}
+            {...props}
+        />
+    )
+}
 
 export default function CalendarPage() {
     const [date, setDate] = useState<Date | undefined>(new Date())
@@ -50,51 +95,15 @@ export default function CalendarPage() {
             </div>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>
-                        {date ? date.toLocaleString("default", { month: "long", year: "numeric" }) : "Calendar"}
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                                if (date) {
-                                    const newDate = new Date(date)
-                                    newDate.setMonth(date.getMonth() - 1)
-                                    setDate(newDate)
-                                }
-                            }}
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                                if (date) {
-                                    const newDate = new Date(date)
-                                    newDate.setMonth(date.getMonth() + 1)
-                                    setDate(newDate)
-                                }
-                            }}
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setDate(new Date())}>
-                            Today
-                        </Button>
-                    </div>
-                </CardHeader>
                 <CardContent>
                     {view === "month" && (
                         <div className="p-3">
-                            <Calendar
+                            <CalendarComponent
                                 mode="single"
                                 selected={date}
                                 onSelect={setDate}
                                 className="rounded-md border"
-
+                                showOutsideDays={false}
                             />
                         </div>
                     )}
@@ -102,7 +111,12 @@ export default function CalendarPage() {
                     {view === "day" && date && (
                         <div className="space-y-4 p-4">
                             <h3 className="font-medium text-lg">
-                                {date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                                {date.toLocaleDateString("en-US", {
+                                    weekday: "long",
+                                    month: "long",
+                                    day: "numeric",
+                                    year: "numeric"
+                                })}
                             </h3>
 
                             <div className="space-y-2">
@@ -159,7 +173,6 @@ export default function CalendarPage() {
     )
 }
 
-
 function getCategoryBadgeColor(category: string) {
     switch (category.toLowerCase()) {
         case "academic":
@@ -207,7 +220,6 @@ function groupEventsByDate() {
     return grouped
 }
 
-// Sample calendar events data
 const calendarEvents = [
     {
         name: "Engineering Expo 2025",

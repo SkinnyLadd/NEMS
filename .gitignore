@@ -2,6 +2,8 @@
  !.mvn/wrapper/maven-wrapper.jar
  !**/src/main/**/target/
  !**/src/test/**/target/
+# Ignore node_modules
+node_modules/
 
  ### IntelliJ IDEA ###
  .idea/modules.xml

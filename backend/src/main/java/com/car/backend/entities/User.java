@@ -37,6 +37,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "cms", nullable = false)
+    private Long cms;
+
     @Column(name = "role", nullable = false, length = 30)
     private String role;
 
@@ -80,5 +83,7 @@ public class User {
     @Column(name = "batch", columnDefinition = "batch_enum not null")
     @Enumerated(EnumType.STRING)
     private Batch batch;
+
+
 
 }

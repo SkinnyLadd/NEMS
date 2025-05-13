@@ -1,6 +1,5 @@
 package com.car.backend.entities;
 
-import com.car.backend.entities.enums.Level;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,10 +24,6 @@ public class Course {
     @Column(name = "course_id", nullable = false)
     private Integer id;
 
-    @Column(name = "course_code", nullable = false, length = 10)
-    private String courseCode;
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
 
     @Column(name = "course_name", nullable = false, length = Integer.MAX_VALUE)
     private String courseName;
@@ -39,7 +34,4 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private School school;
 
-    @Column(name = "level", columnDefinition = "level_enum not null")
-    @Enumerated(EnumType.STRING)
-    private Level level;
 }

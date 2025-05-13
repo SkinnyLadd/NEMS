@@ -6,5 +6,6 @@ public enum MerchSize {
     M,
     L,
     XL,
-    XXL;
+    XXL,
+    ONE_SIZE;
 }

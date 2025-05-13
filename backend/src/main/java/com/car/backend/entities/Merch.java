@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -39,4 +41,10 @@ public class Merch {
     @Column(name = "merch_size", columnDefinition = "merch_size_enum not null")
     @Enumerated(EnumType.STRING)
     private MerchSize merchSize;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "event_id")
+    private Event event;
+
 }

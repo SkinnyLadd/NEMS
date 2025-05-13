@@ -4,6 +4,7 @@ import com.car.backend.entities.enums.Batch;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -37,7 +38,8 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "cms", nullable = false)
+    @Check(constraints = "cms > 99999 AND cms < 1000000")
+    @Column(name = "cms")
     private Long cms;
 
     @Column(name = "role", nullable = false, length = 30)

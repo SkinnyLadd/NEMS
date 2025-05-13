@@ -1,6 +1,7 @@
 package com.car.backend.controllers;
 
 import com.car.backend.DTO.CourseDTO;
+import com.car.backend.entities.enums.School;
 import com.car.backend.services.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +16,8 @@ public class CourseController {
     private CourseService service;
 
     @GetMapping("/school/{school}")
-    public List<CourseDTO> getCoursesBySchool(@PathVariable String school) {
+    public List<CourseDTO> getCoursesBySchool(@PathVariable School school) {
         return service.getCoursesBySchool(school);
-    }
-
-    @GetMapping("/level/{level}")
-    public List<CourseDTO> getCoursesByLevel(@PathVariable String level) {
-        return service.getCoursesByLevel(level);
-    }
-
-    @GetMapping("/code/{courseCode}")
-    public CourseDTO getCourseByCode(@PathVariable String courseCode) {
-        return service.getCourseByCode(courseCode);
     }
 
     @PostMapping

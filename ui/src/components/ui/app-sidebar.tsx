@@ -122,10 +122,10 @@ export function AppSidebar() {
                                 <SidebarMenuButton size="lg">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                                        <AvatarFallback>JD</AvatarFallback>
+                                        <AvatarFallback>X</AvatarFallback>
                                     </Avatar>
                                     <div className="flex flex-col items-start">
-                                        <span className="text-sm font-medium text-primary">John Doe</span>
+                                        <span className="text-sm font-medium text-primary">Maudat Jamoon</span>
                                         <span className="text-xs text-muted-foreground">Administrator</span>
                                     </div>
                                 </SidebarMenuButton>

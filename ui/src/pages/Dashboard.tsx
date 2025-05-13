@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Clock, MapPin, Users, BarChart3, CalendarDays, ArrowUpRight, Bell, PlusCircle } from "lucide-react"
+import { Calendar, Clock, MapPin, Users, BarChart3, CalendarDays, ArrowUpRight, Bell } from "lucide-react"
 
 export default function DashboardPage() {
     return (
@@ -10,12 +10,12 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-muted-foreground">Welcome back, John Doe</p>
+                    <p className="text-muted-foreground">Welcome back</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline">
                         <Calendar className="mr-2 h-4 w-4" />
-                        May 4, 2025
+                        {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                     </Button>
                 </div>
             </div>
@@ -224,10 +224,6 @@ export default function DashboardPage() {
                         <CardDescription>Frequently used actions</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-2">
-                        <Button className="w-full justify-start">
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Create New Event
-                        </Button>
                         <Button variant="outline" className="w-full justify-start">
                             <Calendar className="mr-2 h-4 w-4" />
                             View Calendar

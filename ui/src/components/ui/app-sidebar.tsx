@@ -25,19 +25,21 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
+import Logo from "@/assets/NEMSlogo.svg"
 
 export function AppSidebar() {
     return (
         <Sidebar>
             <SidebarHeader className="h-16 flex items-center px-4 border-b">
                 <div className="flex items-center gap-2">
-                    <div className="bg-primary rounded-md w-8 h-8 flex items-center justify-center text-white font-bold">N</div>
-                    <div className="font-semibold text-lg">NUST Events</div>
+                    <img src={Logo} alt="NEMS Logo" className="w-8 h-8" />
+                    <div className="font-semibold text-lg text-primary">NEMS</div>
                 </div>
             </SidebarHeader>
+
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Main</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-primary">Main</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
@@ -50,7 +52,7 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/events/create">
+                                    <a href="/events/create" className="text-primary">
                                         <PlusCircle className="h-5 w-5" />
                                         <span>Create Event</span>
                                     </a>
@@ -58,7 +60,7 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/events/manage">
+                                    <a href="/events/manage" className="text-primary">
                                         <ClipboardList className="h-5 w-5" />
                                         <span>Manage Events</span>
                                     </a>
@@ -66,7 +68,7 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/calendar">
+                                    <a href="/calendar" className="text-primary">
                                         <Calendar className="h-5 w-5" />
                                         <span>Calendar</span>
                                     </a>
@@ -74,7 +76,7 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/notifications">
+                                    <a href="/notifications" className="text-primary">
                                         <Bell className="h-5 w-5" />
                                         <span>Notifications</span>
                                         <Badge className="ml-auto bg-primary text-white text-xs">3</Badge>
@@ -84,14 +86,16 @@ export function AppSidebar() {
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
+
                 <SidebarSeparator />
+
                 <SidebarGroup>
-                    <SidebarGroupLabel>Administration</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-primary">Administration</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/users">
+                                    <a href="/users" className="text-primary">
                                         <Users className="h-5 w-5" />
                                         <span>User Management</span>
                                     </a>
@@ -99,7 +103,7 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/settings">
+                                    <a href="/settings" className="text-primary">
                                         <Settings className="h-5 w-5" />
                                         <span>Settings</span>
                                     </a>
@@ -109,6 +113,7 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -120,7 +125,7 @@ export function AppSidebar() {
                                         <AvatarFallback>JD</AvatarFallback>
                                     </Avatar>
                                     <div className="flex flex-col items-start">
-                                        <span className="text-sm font-medium">John Doe</span>
+                                        <span className="text-sm font-medium text-primary">John Doe</span>
                                         <span className="text-xs text-muted-foreground">Administrator</span>
                                     </div>
                                 </SidebarMenuButton>
@@ -146,6 +151,7 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
+
             <SidebarRail />
         </Sidebar>
     )

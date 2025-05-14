@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon, Clock, MapPin, Users, Tag, Plus, Trash2 } from "lucide-react"
+import { CalendarIcon, Clock, MapPin, Tag, Plus, Trash2 } from "lucide-react"
 import Logo from "@/assets/NEMSlogo.svg"
 
 // Date picker components
@@ -81,25 +81,6 @@ export default function CreateEvent() {
         const updatedModules = [...eventData.modules]
         updatedModules.splice(index, 1)
         setEventData((prev) => ({ ...prev, modules: updatedModules }))
-    }
-
-    const handleOrganizerChange = (index: number, field: string, value: string) => {
-        const updatedOrganizers = [...eventData.organizers]
-        updatedOrganizers[index] = { ...updatedOrganizers[index], [field]: value }
-        setEventData((prev) => ({ ...prev, organizers: updatedOrganizers }))
-    }
-
-    const addOrganizer = () => {
-        setEventData((prev) => ({
-            ...prev,
-            organizers: [...prev.organizers, { userId: "", portfolio: "", role: "" }],
-        }))
-    }
-
-    const removeOrganizer = (index: number) => {
-        const updatedOrganizers = [...eventData.organizers]
-        updatedOrganizers.splice(index, 1)
-        setEventData((prev) => ({ ...prev, organizers: updatedOrganizers }))
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -462,84 +443,12 @@ export default function CreateEvent() {
                         </div>
                     </div>
 
-                    {/* Organizers */}
-                    <div className="rounded-lg bg-white p-6 shadow-sm">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-xl font-semibold text-gray-800">Event Organizers</h2>
-                            <Button type="button" variant="outline" size="sm" onClick={addOrganizer} className="flex items-center">
-                                <Plus className="mr-1 h-4 w-4" />
-                                Add Organizer
-                            </Button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {eventData.organizers.map((organizer, index) => (
-                                <div key={index} className="rounded-md border border-gray-200 p-4">
-                                    <div className="mb-4 flex items-center justify-between">
-                                        <h3 className="text-sm font-medium text-gray-700">Organizer #{index + 1}</h3>
-                                        {index > 0 && (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => removeOrganizer(index)}
-                                                className="h-8 w-8 p-0 text-red-500"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                        <div className="space-y-2">
-                                            <label className="block text-sm font-medium text-gray-700">User ID / Email</label>
-                                            <div className="relative">
-                                                <Users className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                                                <Input
-                                                    placeholder="Enter user ID or email"
-                                                    className="h-10 pl-9"
-                                                    value={organizer.userId}
-                                                    onChange={(e) => handleOrganizerChange(index, "userId", e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="block text-sm font-medium text-gray-700">Portfolio</label>
-                                            <Input
-                                                placeholder="Enter portfolio"
-                                                className="h-10"
-                                                value={organizer.portfolio}
-                                                onChange={(e) => handleOrganizerChange(index, "portfolio", e.target.value)}
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="block text-sm font-medium text-gray-700">Role</label>
-                                            <Select onValueChange={(value) => handleOrganizerChange(index, "role", value)}>
-                                                <SelectTrigger className="h-10">
-                                                    <SelectValue placeholder="Select Role" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="HEAD">Head</SelectItem>
-                                                    <SelectItem value="DEPUTY_HEAD">Deputy Head</SelectItem>
-                                                    <SelectItem value="COORDINATOR">Coordinator</SelectItem>
-                                                    <SelectItem value="MEMBER">Member</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
                     {/* Submit Button */}
                     <div className="flex justify-end space-x-4">
                         <Button type="button" variant="outline" className="px-6" onClick={() => navigate("/dashboard")}>
                             Cancel
                         </Button>
-                        <Button type="submit" className="bg-primary px-6 text-white hover:bg-primary/90">
+                        <Button type="submit" className="bg-primary px-6 text-primary hover:bg-primary/90">
                             Create Event
                         </Button>
                     </div>

@@ -1,6 +1,19 @@
 "use client"
 
-import { Calendar, Home, Users, Bell, PlusCircle, ClipboardList, LogOut, Settings, User } from "lucide-react"
+import {
+    Calendar,
+    Home,
+    Users,
+    ClipboardList,
+    LogOut,
+    Settings,
+    User,
+    BadgeDollarSign,
+    Eye,
+    Ticket,
+    ShoppingBag,
+    Heart
+} from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
     Sidebar,
@@ -24,7 +37,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
 import Logo from "@/assets/NEMSlogo.svg"
 
 export function AppSidebar() {
@@ -43,7 +55,7 @@ export function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive>
+                                <SidebarMenuButton asChild>
                                     <a href="/dashboard">
                                         <Home className="h-5 w-5" />
                                         <span>Dashboard</span>
@@ -52,8 +64,58 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
+                                    <a href="/calendar" className="text-primary">
+                                        <Calendar className="h-5 w-5" />
+                                        <span>Calendar</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="/events/view" className="text-primary">
+                                        <Eye className="h-5 w-5" />
+                                        <span>View Events</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="/merch" className="text-primary">
+                                        <ShoppingBag className="h-5 w-5" />
+                                        <span>Buy Merchandise</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="/donate" className="text-primary">
+                                        <Heart className="h-5 w-5" />
+                                        <span>Make a Donation</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+
+                <SidebarSeparator />
+
+                <SidebarGroup>
+                    <SidebarGroupLabel className="text-primary">Society Officials</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="/members" className="text-primary">
+                                        <Users className="h-5 w-5" />
+                                        <span>Members</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
                                     <a href="/events/create" className="text-primary">
-                                        <PlusCircle className="h-5 w-5" />
+                                        <ClipboardList className="h-5 w-5" />
                                         <span>Create Event</span>
                                     </a>
                                 </SidebarMenuButton>
@@ -68,44 +130,25 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/calendar" className="text-primary">
-                                        <Calendar className="h-5 w-5" />
-                                        <span>Calendar</span>
+                                    <a href="/ticketing" className="text-primary">
+                                        <Ticket className="h-5 w-5" />
+                                        <span>Manage Tickets</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/notifications" className="text-primary">
-                                        <Bell className="h-5 w-5" />
-                                        <span>Notifications</span>
-                                        <Badge className="ml-auto bg-primary text-white text-xs">3</Badge>
-                                    </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-
-                <SidebarSeparator />
-
-                <SidebarGroup>
-                    <SidebarGroupLabel className="text-primary">Administration</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <a href="/users" className="text-primary">
-                                        <Users className="h-5 w-5" />
-                                        <span>User Management</span>
+                                    <a href="/applications" className="text-primary">
+                                        <ClipboardList className="h-5 w-5" />
+                                        <span>Manage Applications</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="/settings" className="text-primary">
-                                        <Settings className="h-5 w-5" />
-                                        <span>Settings</span>
+                                    <a href="/donations" className="text-primary">
+                                        <BadgeDollarSign className="h-5 w-5" />
+                                        <span>Donations</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

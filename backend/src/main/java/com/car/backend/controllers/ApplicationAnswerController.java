@@ -1,6 +1,6 @@
 package com.car.backend.controllers;
 
-import com.car.backend.dto.ApplicationAnswerDTO;
+import com.car.backend.DTO.ApplicationAnswerDTO;
 import com.car.backend.services.ApplicationAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

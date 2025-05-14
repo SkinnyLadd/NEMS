@@ -2,6 +2,7 @@ package com.car.backend.services;
 
 import com.car.backend.DTO.RegistrationDTO;
 import com.car.backend.entities.Registration;
+import com.car.backend.entities.enums.PaymentStatus;
 import com.car.backend.repositories.RegistrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class RegistrationService {
     }
 
     public List<RegistrationDTO> getRegistrationsByPaymentStatus(String paymentStatus) {
-        return repository.findByPaymentStatus(paymentStatus).stream()
+        return repository.findByPaymentStatus(PaymentStatus.valueOf(paymentStatus)).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

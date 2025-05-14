@@ -2,6 +2,7 @@ package com.car.backend.services;
 
 import com.car.backend.DTO.TicketDTO;
 import com.car.backend.entities.Ticket;
+import com.car.backend.entities.enums.TicketType;
 import com.car.backend.repositories.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class TicketService {
     }
 
     public List<TicketDTO> getTicketsByType(String ticketType) {
-        return repository.findByTicketType(ticketType).stream()
+        return repository.findByTicketType(TicketType.valueOf(ticketType)).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

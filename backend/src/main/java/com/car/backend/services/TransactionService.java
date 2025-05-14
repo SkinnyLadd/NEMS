@@ -2,6 +2,8 @@ package com.car.backend.services;
 
 import com.car.backend.DTO.TransactionDTO;
 import com.car.backend.entities.Transaction;
+import com.car.backend.entities.enums.PaymentMethod;
+import com.car.backend.entities.enums.TransType;
 import com.car.backend.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,13 @@ public class TransactionService {
     }
 
     public List<TransactionDTO> getTransactionsByTransType(String transType) {
-        return repository.findByTransType(transType).stream()
+        return repository.findByTransType(TransType.valueOf(transType)).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     public List<TransactionDTO> getTransactionsByPaymentMethod(String paymentMethod) {
-        return repository.findByPaymentMethod(paymentMethod).stream()
+        return repository.findByPaymentMethod(PaymentMethod.valueOf(paymentMethod)).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

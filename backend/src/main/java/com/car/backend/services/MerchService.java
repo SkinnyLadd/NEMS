@@ -2,6 +2,7 @@ package com.car.backend.services;
 
 import com.car.backend.DTO.MerchDTO;
 import com.car.backend.entities.Merch;
+import com.car.backend.entities.enums.MerchType;
 import com.car.backend.repositories.MerchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class MerchService {
     }
 
     public List<MerchDTO> getMerchByType(String merchType) {
-        return repository.findByMerchType(merchType).stream()
+        return repository.findByMerchType(MerchType.valueOf(merchType)).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

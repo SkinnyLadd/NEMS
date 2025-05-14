@@ -1,13 +1,11 @@
 import { Outlet } from "react-router-dom"
 import { AppSidebar } from "@/components/ui/app-sidebar"
-import { MainNav } from "@/components/ui/main-nav"
 
 export const Layout = () => {
     return (
         <div className="flex h-screen">
             <AppSidebar />
             <div className="flex flex-col flex-1">
-                <MainNav />
                 <main className="flex-1 p-4 overflow-y-auto">
                     <Outlet />
                 </main>

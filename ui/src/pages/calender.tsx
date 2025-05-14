@@ -67,7 +67,7 @@ export default function CalendarPage() {
                     <p className="text-muted-foreground">Browse all campus events in calendar view</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setView("list")}>
+                    <Button variant="outline" size="sm" className="ml-5" onClick={() => setView("list")}>
                         <List className="h-4 w-4 mr-2" />
                         List
                     </Button>

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Clock, MapPin, Users, Bell } from "lucide-react"
+import { Calendar, Clock, MapPin, Users} from "lucide-react"
 
 export default function DashboardPage() {
     return (
@@ -132,66 +132,6 @@ export default function DashboardPage() {
                     </div>
                 </TabsContent>
             </Tabs>
-
-            <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Notifications</CardTitle>
-                        <CardDescription>Recent system announcements and reminders</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex items-start gap-4 rounded-lg border p-3">
-                            <div className="rounded-full bg-primary/10 p-1">
-                                <Bell className="h-4 w-4 text-primary" />
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium">New event approval required</p>
-                                <p className="text-xs text-muted-foreground">
-                                    Engineering Department submitted "Tech Talk 2025" for approval
-                                </p>
-                                <p className="text-xs text-muted-foreground">10 minutes ago</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-4 rounded-lg border p-3">
-                            <div className="rounded-full bg-primary/10 p-1">
-                                <Bell className="h-4 w-4 text-primary" />
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium">Venue change alert</p>
-                                <p className="text-xs text-muted-foreground">The "AI Workshop" has been moved to Room CS-101</p>
-                                <p className="text-xs text-muted-foreground">2 hours ago</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-4 rounded-lg border p-3">
-                            <div className="rounded-full bg-primary/10 p-1">
-                                <Bell className="h-4 w-4 text-primary" />
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium">System maintenance</p>
-                                <p className="text-xs text-muted-foreground">Scheduled maintenance on May 8, 2025 from 2-4 AM</p>
-                                <p className="text-xs text-muted-foreground">1 day ago</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Quick Actions</CardTitle>
-                        <CardDescription>Frequently used actions</CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-2">
-                        <Button variant="outline" className="w-full justify-start">
-                            <Calendar className="mr-2 h-4 w-4" />
-                            View Calendar
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                            <Bell className="mr-2 h-4 w-4" />
-                            View All Notifications
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
         </main>
     )
 }

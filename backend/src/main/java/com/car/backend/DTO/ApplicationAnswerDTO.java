@@ -1,4 +1,4 @@
-package com.car.backend.dto;
+package com.car.backend.DTO;
 
 import lombok.Data;
 

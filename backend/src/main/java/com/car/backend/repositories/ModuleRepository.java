@@ -9,4 +9,6 @@ import java.util.List;
 public interface ModuleRepository extends JpaRepository<Module, Integer> {
     List<Module> findByVenueContainingIgnoreCase(String venue);
     List<Module> findByStartTimeBeforeAndEndTimeAfter(Instant startTime, Instant endTime);
+
+
 }

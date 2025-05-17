@@ -34,6 +34,9 @@ public class Event {
     @Column(name = "end_time", nullable = false)
     private Instant endTime;
 
+    @Column(name = "venue", length = Integer.MAX_VALUE)
+    private String venue;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "society_id", nullable = false)
@@ -57,5 +60,13 @@ public class Event {
 
     @OneToMany(mappedBy = "event")
     private Set<Ticket> tickets = new LinkedHashSet<>();
+
+
+
+    @OneToMany(mappedBy = "event")
+    private Set<Merch> merches = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "event")
+    private Set<Module> modules = new LinkedHashSet<>();
 
 }

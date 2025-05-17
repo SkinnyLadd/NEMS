@@ -27,10 +27,14 @@ public class Ticket {
     @Column(name = "available_tickets", nullable = false)
     private Integer availableTickets;
 
+    @Column(name = "ticket_price")
+    private Long ticketPrice;
 
     @Column(name = "ticket_type", columnDefinition = "ticket_enum not null")
     @ColumnDefault("'STANDARD'")
     @Enumerated(EnumType.STRING)
     private TicketType ticketType;
+
+
 
 }

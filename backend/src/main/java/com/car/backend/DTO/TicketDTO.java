@@ -9,5 +9,5 @@ public class TicketDTO {
     private Long price;
     private Integer eventId;
     private Integer availableTickets;
-    private TicketType ticketType;
+    private String ticketType;
 }

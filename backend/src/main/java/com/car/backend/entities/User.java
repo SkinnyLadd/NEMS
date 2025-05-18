@@ -86,6 +86,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Batch batch;
 
+    public String getName() {
+        return firstName + " " + lastName;
+    }
+
 
 
 }

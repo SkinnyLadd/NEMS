@@ -19,6 +19,16 @@ public class SocietyController {
         return service.getSocietiesByName(socName);
     }
 
+    @GetMapping
+    public List<SocietyDTO> getAllSocieties() {
+        return service.getAllSocieties();
+    }
+
+//    @GetMapping
+//    public List<SocietyDTO> getSocietiesById(@RequestParam Integer Id) {
+//        return service.getSocietiesById(Id);
+//    }
+
     @PostMapping
     public SocietyDTO saveSociety(@RequestBody SocietyDTO dto) {
         return service.saveSociety(dto);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -15,23 +16,14 @@ public class ApplicationController {
     @Autowired
     private ApplicationService applicationService;
 
-    @GetMapping("/status/{status}")
-    public List<ApplicationDTO> getApplicationsByStatus(@PathVariable AppStatus status) {
-        return applicationService.getApplicationsByStatus(status);
+    @GetMapping
+    public List<ApplicationDTO> getAllApplications() {
+        return applicationService.getAllApplications();
     }
 
-    @GetMapping("/applicant/{applicantId}")
-    public List<ApplicationDTO> getApplicationsByApplicantId(@PathVariable Integer applicantId) {
-        return applicationService.getApplicationsByApplicantId(applicantId);
-    }
-
-    @GetMapping("/template/{templateId}")
-    public List<ApplicationDTO> getApplicationsByTemplateId(@PathVariable Integer templateId) {
-        return applicationService.getApplicationsByTemplateId(templateId);
-    }
-
-    @PostMapping
-    public ApplicationDTO saveApplication(@RequestBody ApplicationDTO applicationDTO) {
-        return applicationService.saveApplication(applicationDTO);
+    @PutMapping("/{id}/status")
+    public void updateStatus(@PathVariable int id, @RequestBody Map<String, String> body) {
+        String status = body.get("status");
+        applicationService.updateApplicationStatus(id, status);
     }
 }

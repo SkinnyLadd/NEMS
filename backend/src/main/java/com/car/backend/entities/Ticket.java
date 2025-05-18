@@ -1,6 +1,7 @@
 package com.car.backend.entities;
 
 import com.car.backend.entities.enums.TicketType;
+import com.car.backend.converters.TicketTypeConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +31,12 @@ public class Ticket {
     @Column(name = "ticket_price")
     private Long ticketPrice;
 
-    @Column(name = "ticket_type", columnDefinition = "ticket_enum not null")
-    @ColumnDefault("'STANDARD'")
     @Enumerated(EnumType.STRING)
+//    @Convert(converter = TicketTypeConverter.class)
+//    @Type(PostgreSQLEnumType.class)
+    @Column(name = "ticket_type", columnDefinition = "ticket_enum")
     private TicketType ticketType;
+
 
 
 

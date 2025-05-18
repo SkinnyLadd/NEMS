@@ -8,10 +8,5 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ApplicationAnswerRepository extends JpaRepository<ApplicationAnswer, Integer> {
-
-    @Query("SELECT a FROM ApplicationAnswer a WHERE a.application.id = :applicationId")
-    List<ApplicationAnswer> findByApplicationId(@Param("applicationId") Integer applicationId);
-
-    @Query("SELECT a FROM ApplicationAnswer a WHERE a.question.id = :questionId")
-    List<ApplicationAnswer> findByQuestionId(@Param("questionId") Integer questionId);
+    List<ApplicationAnswer> findByApplicationId(Integer applicationId);
 }

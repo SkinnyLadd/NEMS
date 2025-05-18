@@ -9,6 +9,7 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Integer> {
     List<Event> findBySocietyId(Integer societyId);
 
+
     @Query("SELECT e FROM Event e WHERE e.startTime >= :start AND e.endTime <= :end")
     List<Event> findByDateRange(Instant start, Instant end);
 

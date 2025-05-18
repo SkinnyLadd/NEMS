@@ -3,6 +3,7 @@ package com.car.backend.DTO;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class EventDTO {
@@ -13,4 +14,6 @@ public class EventDTO {
     private Instant endTime;
     private Integer societyId;
     private String venue;
+
+    private List<TicketDTO> tickets;
 }

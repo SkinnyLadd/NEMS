@@ -41,6 +41,12 @@ public class EventController {
         return service.searchEventsByTitle(title);
     }
 
+    @GetMapping("/{id}")
+    public EventDTO getEventById(@PathVariable Integer id) {
+        return service.getEventById(id);
+    }
+
+
 //    @PostMapping
 //    public EventDTO saveEvent(@RequestBody EventDTO dto) {
 //
@@ -48,7 +54,7 @@ public class EventController {
 //        return service.saveEvent(dto);
 //    }
 
-    @PostMapping("/api/events")
+    @PostMapping
     public ResponseEntity<EventDTO> createEvent(@RequestBody EventCreateRequestDTO request) {
         EventDTO createdEvent = service.createEventFromRequest(request);
         return ResponseEntity.ok(createdEvent);

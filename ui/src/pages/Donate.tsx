@@ -1,44 +1,50 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import axios from "axios"
+import {
+    Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Heart } from "lucide-react"
 
-// Mock data - replace with API call
-const societies = [
-    "Computing Society",
-    "Cultural Society",
-    "Sports Society",
-    "Literary Society"
-]
-
 interface DonationForm {
     amount: string
-    society: string
-    name: string
-    regNo?: string
-    type: "student" | "alumni" | "other"
-    message?: string
+    eventId: string
+}
+
+interface EventOption {
+    id: number
+    title: string
 }
 
 export default function Donate() {
     const navigate = useNavigate()
     const [form, setForm] = useState<DonationForm>({
         amount: "",
-        society: "",
-        name: "",
-        type: "student"
+        eventId: ""
     })
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [events, setEvents] = useState<EventOption[]>([])
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await axios.get("http://localhost:8080/api/events")
+                setEvents(res.data)
+            } catch (err) {
+                console.error("Failed to fetch events", err)
+            }
+        }
+        fetchEvents()
+    }, [])
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Validate form
-        if (!form.amount || !form.society || !form.name || !form.type) {
+        if (!form.amount || !form.eventId) {
             alert("Please fill in all required fields")
             return
         }
@@ -48,11 +54,17 @@ export default function Donate() {
             return
         }
 
-        // Mock submission - replace with API call
-        console.log("Submitting donation:", form)
+        try {
+            await axios.post("http://localhost:8080/api/donations", {
+                amount: Number(form.amount),
+                eventId: Number(form.eventId)
+            })
 
-        // Navigate to success page or donations list
-        navigate("/dashboard")
+            navigate("/donations")
+        } catch (err) {
+            console.error("Failed to submit donation", err)
+            alert("Donation failed. Please try again.")
+        }
     }
 
     return (
@@ -64,24 +76,24 @@ export default function Donate() {
                         Make a Donation
                     </CardTitle>
                     <CardDescription>
-                        Support your favorite societies and help them grow
+                        Support an event with your contribution
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="society">Society</Label>
+                            <Label htmlFor="event">Event</Label>
                             <Select
-                                value={form.society}
-                                onValueChange={(value) => setForm(prev => ({ ...prev, society: value }))}
+                                value={form.eventId}
+                                onValueChange={(value) => setForm(prev => ({ ...prev, eventId: value }))}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select a society" />
+                                    <SelectValue placeholder="Select an event" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {societies.map(society => (
-                                        <SelectItem key={society} value={society}>
-                                            {society}
+                                    {events.map(event => (
+                                        <SelectItem key={event.id} value={String(event.id)}>
+                                            {event.title}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -96,56 +108,6 @@ export default function Donate() {
                                 placeholder="Enter amount"
                                 value={form.amount}
                                 onChange={(e) => setForm(prev => ({ ...prev, amount: e.target.value }))}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Your Name</Label>
-                            <Input
-                                id="name"
-                                placeholder="Enter your name"
-                                value={form.name}
-                                onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="type">You are a</Label>
-                            <Select
-                                value={form.type}
-                                onValueChange={(value: "student" | "alumni" | "other") => 
-                                    setForm(prev => ({ ...prev, type: value }))}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select your type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="student">Student</SelectItem>
-                                    <SelectItem value="alumni">Alumni</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {form.type === "student" && (
-                            <div className="space-y-2">
-                                <Label htmlFor="regNo">Registration Number</Label>
-                                <Input
-                                    id="regNo"
-                                    placeholder="Enter your registration number"
-                                    value={form.regNo || ""}
-                                    onChange={(e) => setForm(prev => ({ ...prev, regNo: e.target.value }))}
-                                />
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            <Label htmlFor="message">Message (Optional)</Label>
-                            <Textarea
-                                id="message"
-                                placeholder="Leave a message with your donation"
-                                value={form.message || ""}
-                                onChange={(e) => setForm(prev => ({ ...prev, message: e.target.value }))}
                             />
                         </div>
                     </CardContent>
@@ -166,4 +128,4 @@ export default function Donate() {
             </Card>
         </div>
     )
-} 
+}

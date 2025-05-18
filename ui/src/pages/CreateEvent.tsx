@@ -2,7 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+
+
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +18,8 @@ import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calender"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
+import axios from "axios"
+
 export default function CreateEvent() {
     const navigate = useNavigate()
     const [eventData, setEventData] = useState({
@@ -27,9 +31,9 @@ export default function CreateEvent() {
         endTime: "",
         society: "",
         venue: "",
-        ticketTypes: [{ type: "GENERAL", price: "", quantity: "" }],
-        modules: [{ name: "", description: "", venue: "", startTime: "", endTime: "" }],
-        organizers: [{ userId: "", portfolio: "", role: "" }],
+        ticketTypes: [{ type: "STANDARD", price: "", quantity: "" }],
+        modules: [{ name: "", description: "", venue: "", moduleDate:"", startTime: "", endTime: "" }],
+        // organizers: [{ userId: "", portfolio: "", role: "" }],
     })
 
     // For date picker
@@ -73,7 +77,7 @@ export default function CreateEvent() {
     const addModule = () => {
         setEventData((prev) => ({
             ...prev,
-            modules: [...prev.modules, { name: "", description: "", venue: "", startTime: "", endTime: "" }],
+            modules: [...prev.modules, { name: "", description: "", venue: "",moduleDate:"", startTime: "", endTime: "" }],
         }))
     }
 
@@ -83,12 +87,62 @@ export default function CreateEvent() {
         setEventData((prev) => ({ ...prev, modules: updatedModules }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [Loading ,setLoading] = useState(false)
+    const [Error, setError] = useState<string | null>(null)
+
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        console.log("Event data:", eventData)
-        // Navigate to events page after creation
-        navigate("/dashboard")
+        setLoading(true)
+        setError(null)
+        try {
+            const payload = {
+                title: eventData.title,
+                description: eventData.description,
+                startDate: `${eventData.startDate}T${eventData.startTime}:00Z`,
+                endDate: `${eventData.endDate}T${eventData.endTime}:00Z`,
+                societyId: Number(eventData.society),
+                venue: eventData.venue,
+                modules: eventData.modules.map((mod) => ({
+                    description: mod.description,
+                    venue: mod.venue,
+                    startTime: `${mod.moduleDate}T${mod.startTime}:00Z`,
+                    endTime: `${mod.moduleDate}T${mod.endTime}:00Z`,
+                })),
+                ticketTypes: eventData.ticketTypes.map((ticket) => ({
+                    ticketType: ticket.type, // must match enum: e.g., "GENERAL", "VIP"
+                    price: Number(ticket.price),
+                    availableTickets: Number(ticket.quantity)
+                }))
+            }
+
+            await axios.post("http://localhost:8080/api/events", payload)
+            navigate("/dashboard")
+        } catch (err) {
+            console.error(err)
+            setError("Failed to create event")
+        } finally {
+            setLoading(false)
+        }
     }
+
+
+    const [societies, setSocieties] = useState<{ id: number, socName: string }[]>([])
+
+    useEffect(() => {
+        const fetchSocieties = async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/api/societies")
+                setSocieties(response.data)
+            } catch (error) {
+                console.error("Error fetching societies:", error)
+            }
+        }
+        fetchSocieties()
+    }, [])
+
+
 
     return (
         <div className="min-h-screen w-250 bg-primary/5 py-8">
@@ -144,13 +198,14 @@ export default function CreateEvent() {
                                             <SelectValue placeholder="Select Society" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="1">NUST Science Society</SelectItem>
-                                            <SelectItem value="2">NUST Literary Circle</SelectItem>
-                                            <SelectItem value="3">NUST Dramatics Club</SelectItem>
-                                            <SelectItem value="4">NUST ACM Chapter</SelectItem>
-                                            <SelectItem value="5">NUST Music Society</SelectItem>
+                                            {societies.map((society) => (
+                                                <SelectItem key={society.id} value={society.id.toString()}>
+                                                    {society.socName}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
+
                                 </div>
 
                                 <div className="space-y-2">
@@ -311,10 +366,10 @@ export default function CreateEvent() {
                                                     </div>
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="GENERAL">General</SelectItem>
+                                                    <SelectItem value="STANDARD">Standard</SelectItem>
                                                     <SelectItem value="VIP">VIP</SelectItem>
                                                     <SelectItem value="EARLY_BIRD">Early Bird</SelectItem>
-                                                    <SelectItem value="STUDENT">Student</SelectItem>
+                                                    <SelectItem value="FREE">Free</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -398,18 +453,33 @@ export default function CreateEvent() {
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+
                                             <div className="space-y-2">
-                                                <label className="block text-sm font-medium text-gray-700">Venue</label>
-                                                <div className="relative">
-                                                    <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                                                    <Input
-                                                        placeholder="Enter venue"
-                                                        className="h-10 pl-9"
-                                                        value={module.venue}
-                                                        onChange={(e) => handleModuleChange(index, "venue", e.target.value)}
-                                                    />
-                                                </div>
+                                                <label className="block text-sm font-medium text-gray-700">Module Date</label>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button variant="outline" className="h-10 w-full justify-start text-left font-normal">
+                                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                                            {module.moduleDate ? module.moduleDate : <span>Select date</span>}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={module.moduleDate ? new Date(module.moduleDate) : undefined}
+                                                            onSelect={(date) => {
+                                                                if (date) {
+                                                                    const formattedDate = format(date, "yyyy-MM-dd")
+                                                                    handleModuleChange(index, "moduleDate", formattedDate)
+                                                                }
+                                                            }}
+                                                            initialFocus
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
                                             </div>
+
+
 
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-medium text-gray-700">Start Time</label>
@@ -433,6 +503,19 @@ export default function CreateEvent() {
                                                         className="h-10 pl-9"
                                                         value={module.endTime}
                                                         onChange={(e) => handleModuleChange(index, "endTime", e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-gray-700">Venue</label>
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                    <Input
+                                                        placeholder="Enter venue"
+                                                        className="h-10 pl-9"
+                                                        value={module.venue}
+                                                        onChange={(e) => handleModuleChange(index, "venue", e.target.value)}
                                                     />
                                                 </div>
                                             </div>

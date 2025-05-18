@@ -34,8 +34,16 @@ public class Donation {
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
+//    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "donated_at", nullable = false)
     private Instant donatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (donatedAt == null) {
+            donatedAt = Instant.now();
+        }
+    }
+
 
 }

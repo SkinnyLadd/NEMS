@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import axios from "axios"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -18,7 +19,6 @@ import {
 
 interface Application {
     id: number
-    eventId: number
     eventTitle: string
     applicant: {
         name: string
@@ -30,136 +30,64 @@ interface Application {
         question: string
         answer: string
     }[]
-    status: "pending" | "accepted" | "rejected"
+    status: "PENDING" | "APPROVED" | "REJECTED"
     appliedAt: string
 }
 
-// Mock data - replace with API call
-const mockApplications: Application[] = [
-    {
-        id: 1,
-        eventId: 3,
-        eventTitle: "Computing Society Recruitment Drive 2024",
-        applicant: {
-            name: "Hassan Ali",
-            email: "hassan.ali@example.com",
-            regNo: "896723"
-        },
-        answers: [
-            {
-                questionId: 1,
-                question: "What programming languages are you familiar with?",
-                answer: "Python, JavaScript, Java"
-            },
-            {
-                questionId: 2,
-                question: "Why do you want to join the Computing Society? What can you contribute?",
-                answer: "I am passionate about technology and want to collaborate with like-minded individuals. I have experience in web development and can help organize workshops."
-            },
-            {
-                questionId: 3,
-                question: "Which area of computing interests you the most?",
-                answer: "Web Development"
-            },
-            {
-                questionId: 4,
-                question: "Describe any relevant projects or experiences you have in computing.",
-                answer: "I have built several web applications using React and Node.js, including an e-commerce platform and a blog system."
-            }
-        ],
-        status: "pending",
-        appliedAt: "2024-03-20"
-    },
-    {
-        id: 2,
-        eventId: 3,
-        eventTitle: "Computing Society Recruitment Drive 2024",
-        applicant: {
-            name: "Ayesha Khan",
-            email: "ayesha.k@example.com",
-            regNo: "354456"
-        },
-        answers: [
-            {
-                questionId: 1,
-                question: "What programming languages are you familiar with?",
-                answer: "C++, Python, TypeScript"
-            },
-            {
-                questionId: 2,
-                question: "Why do you want to join the Computing Society? What can you contribute?",
-                answer: "I want to grow my technical skills and network with other tech enthusiasts. I can contribute to AI/ML projects and help with technical writing."
-            },
-            {
-                questionId: 3,
-                question: "Which area of computing interests you the most?",
-                answer: "Artificial Intelligence"
-            },
-            {
-                questionId: 4,
-                question: "Describe any relevant projects or experiences you have in computing.",
-                answer: "I have worked on machine learning projects including image classification and natural language processing."
-            }
-        ],
-        status: "accepted",
-        appliedAt: "2024-03-19"
-    }
-]
-
 function StatusBadge({ status }: { status: Application["status"] }) {
     const variants = {
-        pending: "bg-yellow-500",
-        accepted: "bg-green-500",
-        rejected: "bg-red-500"
+        PENDING: "bg-yellow-500",
+        APPROVED: "bg-green-500",
+        REJECTED: "bg-red-500"
     }
-    
+
     return (
         <Badge className={`${variants[status]} text-white`}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status.charAt(0) + status.slice(1).toLowerCase()}
         </Badge>
     )
 }
 
 export default function ManageApplications() {
+    const [applications, setApplications] = useState<Application[]>([])
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState("all")
     const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
 
-    const filteredApplications = mockApplications.filter(application => {
-        const matchesSearch = 
+    useEffect(() => {
+        const fetchData = async () => {
+            const res = await axios.get("http://localhost:8080/api/applications")
+            setApplications(res.data)
+        }
+        fetchData()
+    }, [])
+
+    const filteredApplications = applications.filter(application => {
+        const matchesSearch =
             application.applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             application.applicant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             application.applicant.regNo.toLowerCase().includes(searchTerm.toLowerCase())
 
         const matchesStatus = statusFilter === "all" || application.status === statusFilter
-
         return matchesSearch && matchesStatus
     })
 
-    const handleViewApplication = (application: Application) => {
-        setSelectedApplication(application)
-    }
-
-    const handleUpdateStatus = (applicationId: number, newStatus: Application["status"]) => {
-        // Mock status update - replace with API call
-        console.log("Updating application status:", { applicationId, newStatus })
-        
-        // Close dialog if open
-        if (selectedApplication?.id === applicationId) {
-            setSelectedApplication(null)
-        }
+    const handleUpdateStatus = async (id: number, newStatus: Application["status"]) => {
+        await axios.put(`http://localhost:8080/api/applications/${id}/status`, { status: newStatus })
+        setApplications(prev =>
+            prev.map(app => app.id === id ? { ...app, status: newStatus } : app)
+        )
+        setSelectedApplication(null)
     }
 
     return (
         <div className="container mx-auto py-8 px-4">
+            {/* Filters */}
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold">Manage Applications</h1>
-                    <p className="text-muted-foreground mt-1">
-                        Review and manage society membership applications
-                    </p>
+                    <p className="text-muted-foreground">Review and manage applications</p>
                 </div>
-
                 <div className="flex gap-4">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -176,20 +104,20 @@ export default function ManageApplications() {
                             <SelectValue placeholder="Filter by Status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="accepted">Accepted</SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="APPROVED">Accepted</SelectItem>
+                            <SelectItem value="REJECTED">Rejected</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
             </div>
 
+            {/* Table */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        Applications
+                        <Users className="h-5 w-5" /> Applications
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -197,7 +125,7 @@ export default function ManageApplications() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Applicant</TableHead>
-                                <TableHead>Registration No.</TableHead>
+                                <TableHead>Reg No</TableHead>
                                 <TableHead>Event</TableHead>
                                 <TableHead>Applied On</TableHead>
                                 <TableHead>Status</TableHead>
@@ -205,132 +133,68 @@ export default function ManageApplications() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredApplications.map(application => (
-                                <TableRow key={application.id}>
+                            {filteredApplications.map(app => (
+                                <TableRow key={app.id}>
                                     <TableCell>
-                                        <div>
-                                            <div>{application.applicant.name}</div>
-                                            <div className="text-sm text-muted-foreground flex items-center gap-1">
-                                                <Mail className="h-3 w-3" />
-                                                {application.applicant.email}
-                                            </div>
+                                        <div>{app.applicant.name}</div>
+                                        <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                            <Mail className="h-3 w-3" /> {app.applicant.email}
                                         </div>
                                     </TableCell>
-                                    <TableCell>{application.applicant.regNo}</TableCell>
-                                    <TableCell>{application.eventTitle}</TableCell>
-                                    <TableCell>{application.appliedAt}</TableCell>
-                                    <TableCell>
-                                        <StatusBadge status={application.status} />
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleViewApplication(application)}
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
-                                            {application.status === "pending" && (
-                                                <>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="text-green-600"
-                                                        onClick={() => handleUpdateStatus(application.id, "accepted")}
-                                                    >
-                                                        <Check className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="text-red-600"
-                                                        onClick={() => handleUpdateStatus(application.id, "rejected")}
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </div>
+                                    <TableCell>{app.applicant.regNo}</TableCell>
+                                    <TableCell>{app.eventTitle}</TableCell>
+                                    <TableCell>{new Date(app.appliedAt).toLocaleDateString()}</TableCell>
+                                    <TableCell><StatusBadge status={app.status} /></TableCell>
+                                    <TableCell className="text-right flex justify-end gap-2">
+                                        <Button variant="outline" size="sm" onClick={() => setSelectedApplication(app)}>
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                        {app.status === "PENDING" && (
+                                            <>
+                                                <Button variant="outline" size="sm" onClick={() => handleUpdateStatus(app.id, "APPROVED")} className="text-green-600">
+                                                    <Check className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="outline" size="sm" onClick={() => handleUpdateStatus(app.id, "REJECTED")} className="text-red-600">
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
-
-                    {filteredApplications.length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                            No applications found matching your criteria.
-                        </div>
-                    )}
                 </CardContent>
             </Card>
 
+            {/* Dialog */}
             <Dialog open={!!selectedApplication} onOpenChange={() => setSelectedApplication(null)}>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl">
                     {selectedApplication && (
                         <>
                             <DialogHeader>
                                 <DialogTitle>Application Details</DialogTitle>
                                 <DialogDescription>
-                                    Submitted on {selectedApplication.appliedAt}
+                                    Submitted on {new Date(selectedApplication.appliedAt).toLocaleDateString()} at{" "}
+                                    {new Date(selectedApplication.appliedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                                 </DialogDescription>
+
                             </DialogHeader>
-                            
                             <div className="space-y-6">
-                                <div>
-                                    <h3 className="text-lg font-semibold mb-2">Applicant Information</h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-sm text-muted-foreground">Name</label>
-                                            <div>{selectedApplication.applicant.name}</div>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm text-muted-foreground">Registration No.</label>
-                                            <div>{selectedApplication.applicant.regNo}</div>
-                                        </div>
-                                        <div className="col-span-2">
-                                            <label className="text-sm text-muted-foreground">Email</label>
-                                            <div>{selectedApplication.applicant.email}</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 className="font-semibold text-lg">Applicant Info</h3>
+                                <p><strong>Name:</strong> {selectedApplication.applicant.name}</p>
+                                <p><strong>Email:</strong> {selectedApplication.applicant.email}</p>
+                                <p><strong>Reg No:</strong> {selectedApplication.applicant.regNo}</p>
 
-                                <div>
-                                    <h3 className="text-lg font-semibold mb-4">Application Responses</h3>
-                                    <div className="space-y-6">
-                                        {selectedApplication.answers.map(answer => (
-                                            <div key={answer.questionId}>
-                                                <label className="text-sm font-medium">
-                                                    {answer.question}
-                                                </label>
-                                                <p className="mt-1 text-muted-foreground">
-                                                    {answer.answer}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <h3 className="font-semibold text-lg mt-4">Answers</h3>
+                                <div className="space-y-4">
+                                    {selectedApplication.answers.map(a => (
+                                        <div key={a.questionId}>
+                                            <label className="font-medium">{a.question}</label>
+                                            <p className="text-muted-foreground">{a.answer}</p>
+                                        </div>
+                                    ))}
                                 </div>
-
-                                {selectedApplication.status === "pending" && (
-                                    <div className="flex justify-end gap-4 pt-4">
-                                        <Button
-                                            variant="outline"
-                                            className="text-red-600"
-                                            onClick={() => handleUpdateStatus(selectedApplication.id, "rejected")}
-                                        >
-                                            <X className="mr-2 h-4 w-4" />
-                                            Reject
-                                        </Button>
-                                        <Button
-                                            className="text-green-600"
-                                            onClick={() => handleUpdateStatus(selectedApplication.id, "accepted")}
-                                        >
-                                            <Check className="mr-2 h-4 w-4" />
-                                            Accept
-                                        </Button>
-                                    </div>
-                                )}
                             </div>
                         </>
                     )}
@@ -338,4 +202,4 @@ export default function ManageApplications() {
             </Dialog>
         </div>
     )
-} 
+}

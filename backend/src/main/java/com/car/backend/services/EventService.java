@@ -3,14 +3,17 @@ package com.car.backend.services;
 
 import com.car.backend.DTO.EventCreateRequestDTO;
 import com.car.backend.DTO.EventDTO;
+import com.car.backend.DTO.TicketDTO;
 import com.car.backend.entities.Module;
 import com.car.backend.entities.Event;
 import com.car.backend.entities.Society;
 import com.car.backend.entities.Ticket;
+import com.car.backend.entities.enums.TicketType;
 import com.car.backend.repositories.EventRepository;
 import com.car.backend.repositories.ModuleRepository;
 import com.car.backend.repositories.SocietyRepository;
 import com.car.backend.repositories.TicketRepository;
+import com.car.backend.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +52,13 @@ public class EventService {
         return repository.searchByTitle(title).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    public EventDTO getEventById(Integer id) {
+        Event event = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+        return toDTO(event);
+    }
+
+
     public EventDTO createEventFromRequest(EventCreateRequestDTO dto) {
         Event event = new Event();
         event.setTitle(dto.getTitle());
@@ -77,8 +87,7 @@ public class EventService {
             }).collect(Collectors.toList());
 
             moduleRepository.saveAll(modules);
-            // savedEvent.setModules(new HashSet<>(modules));
-            savedEvent.setModules((Set<Module>) modules);
+            savedEvent.setModules(new HashSet<>(modules));
         }
 
         // Map and attach tickets
@@ -87,13 +96,13 @@ public class EventService {
                 Ticket ticket = new Ticket();
                 ticket.setTicketPrice(ticketDto.getPrice());
                 ticket.setAvailableTickets(ticketDto.getAvailableTickets());
+                ticket.setTicketType(EnumUtils.parseTicketType(ticketDto.getTicketType()));
                 ticket.setEvent(savedEvent);
                 return ticket;
             }).collect(Collectors.toList());
 
             ticketRepository.saveAll(tickets);
-           // savedEvent.setTickets(new HashSet<>(tickets));
-            savedEvent.setTickets((Set<Ticket>) tickets);
+            savedEvent.setTickets(new HashSet<>(tickets));
         }
 
         // Save event again if modules/tickets are set
@@ -103,6 +112,9 @@ public class EventService {
     }
 
     private EventDTO toDTO(Event event) {
+
+
+
         // Map Event to EventDTO
         EventDTO dto = new EventDTO();
         dto.setId(event.getId());
@@ -110,6 +122,15 @@ public class EventService {
         dto.setStartTime(event.getStartTime());
         dto.setEndTime(event.getEndTime());
         // Map other fields as needed
+
+        dto.setTickets(event.getTickets().stream().map(ticket -> {
+            TicketDTO t = new TicketDTO();
+            t.setTicketType(String.valueOf(ticket.getTicketType()));
+            t.setPrice(ticket.getTicketPrice());
+            t.setAvailableTickets(ticket.getAvailableTickets());
+            return t;
+        }).collect(Collectors.toList()));
+
         return dto;
     }
 

@@ -5,7 +5,7 @@ public enum PaymentMethod {
     BANK_TRANSFER("Bank Transfer"),
     CREDIT_CARD("Credit Card"),
     EASYPAISA("EasyPaisa"),
-    JAZZ_CASH("JazzCash"),
+    JAZZCASH("JazzCash"),
     NAYAPAY("NayaPay"),
     SADAPAY("SadaPay");
 

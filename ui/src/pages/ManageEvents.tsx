@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -37,110 +38,9 @@ import {
     ArrowUpDown,
 } from "lucide-react"
 
-// Mock data for events
-const mockEvents = [
-    {
-        id: 1,
-        title: "Engineering Expo 2025",
-        society: "NUST Science Society",
-        startDate: "2025-05-10",
-        startTime: "10:00",
-        endDate: "2025-05-10",
-        endTime: "16:00",
-        venue: "Main Campus Hall",
-        status: "upcoming",
-        registrations: 245,
-        ticketsSold: 245,
-        revenue: 122500,
-    },
-    {
-        id: 2,
-        title: "NUST Sports Tournament",
-        society: "NUST Sports Society",
-        startDate: "2025-05-15",
-        startTime: "09:00",
-        endDate: "2025-05-18",
-        endTime: "18:00",
-        venue: "Sports Complex",
-        status: "upcoming",
-        registrations: 500,
-        ticketsSold: 500,
-        revenue: 250000,
-    },
-    {
-        id: 3,
-        title: "AI & Machine Learning Workshop",
-        society: "NUST ACM Chapter",
-        startDate: "2025-05-12",
-        startTime: "14:00",
-        endDate: "2025-05-12",
-        endTime: "17:00",
-        venue: "Computer Science Building",
-        status: "upcoming",
-        registrations: 120,
-        ticketsSold: 120,
-        revenue: 60000,
-    },
-    {
-        id: 4,
-        title: "Cultural Night 2025",
-        society: "NUST Dramatics Club",
-        startDate: "2025-05-20",
-        startTime: "18:00",
-        endDate: "2025-05-20",
-        endTime: "22:00",
-        venue: "Auditorium",
-        status: "upcoming",
-        registrations: 350,
-        ticketsSold: 350,
-        revenue: 175000,
-    },
-    {
-        id: 5,
-        title: "Spring Art Exhibition",
-        society: "NUST Arts Society",
-        startDate: "2025-05-01",
-        startTime: "10:00",
-        endDate: "2025-05-07",
-        endTime: "18:00",
-        venue: "Art Gallery",
-        status: "ongoing",
-        registrations: 120,
-        ticketsSold: 120,
-        revenue: 60000,
-    },
-    {
-        id: 6,
-        title: "Alumni Meetup",
-        society: "NUST Alumni Association",
-        startDate: "2025-04-28",
-        startTime: "17:00",
-        endDate: "2025-04-28",
-        endTime: "20:00",
-        venue: "Main Hall",
-        status: "completed",
-        registrations: 175,
-        ticketsSold: 175,
-        revenue: 87500,
-    },
-    {
-        id: 7,
-        title: "Hackathon 2025",
-        society: "NUST ACM Chapter",
-        startDate: "2025-04-25",
-        startTime: "09:00",
-        endDate: "2025-04-26",
-        endTime: "21:00",
-        venue: "IT Center",
-        status: "completed",
-        registrations: 120,
-        ticketsSold: 120,
-        revenue: 60000,
-    },
-]
-
 export default function ManageEvents() {
     const navigate = useNavigate()
+    const [events, setEvents] = useState<any[]>([])
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState("all")
     const [societyFilter, setSocietyFilter] = useState("all")
@@ -149,37 +49,61 @@ export default function ManageEvents() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [selectedEventId, setSelectedEventId] = useState<number | null>(null)
 
-    // Filter and sort events
-    const filteredEvents = mockEvents
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await axios.get("http://localhost:8080/api/events")
+                const now = new Date()
+                const transformed = res.data.map((event: any) => {
+                    const start = new Date(event.startTime)
+                    const end = new Date(event.endTime)
+                    let status: "upcoming" | "ongoing" | "completed" = "completed"
+                    if (now < start) status = "upcoming"
+                    else if (now >= start && now <= end) status = "ongoing"
+
+                    return {
+                        id: event.id,
+                        title: event.title,
+                        society: event.society?.socName || "Unknown",
+                        startDate: start.toISOString(),
+                        startTime: start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                        endDate: end.toISOString(),
+                        endTime: end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                        venue: event.venue,
+                        status,
+                        registrations: event.totalRegistrations || 0,
+                        ticketsSold: event.tickets?.reduce((sum: number, t: any) => sum + t.availableTickets, 0) || 0,
+                        revenue: event.tickets?.reduce((sum: number, t: any) => sum + t.ticketPrice * t.availableTickets, 0) || 0,
+                    }
+                })
+                setEvents(transformed)
+            } catch (err) {
+                console.error("Failed to load events", err)
+            }
+        }
+        fetchEvents()
+    }, [])
+
+    const filteredEvents = events
         .filter((event) => {
-            // Search filter
             const matchesSearch =
                 event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 event.society.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 event.venue.toLowerCase().includes(searchTerm.toLowerCase())
-
-            // Status filter
             const matchesStatus = statusFilter === "all" || event.status === statusFilter
-
-            // Society filter
             const matchesSociety = societyFilter === "all" || event.society === societyFilter
-
             return matchesSearch && matchesStatus && matchesSociety
         })
         .sort((a, b) => {
-            // Sort by selected field
             const fieldA = a[sortField as keyof typeof a]
             const fieldB = b[sortField as keyof typeof b]
-
             if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1
             if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1
             return 0
         })
 
-    // Get unique societies for filter
-    const societies = Array.from(new Set(mockEvents.map((event) => event.society)))
+    const societies = Array.from(new Set(events.map((event) => event.society)))
 
-    // Handle sort toggle
     const toggleSort = (field: string) => {
         if (sortField === field) {
             setSortDirection(sortDirection === "asc" ? "desc" : "asc")
@@ -189,15 +113,12 @@ export default function ManageEvents() {
         }
     }
 
-    // Handle delete event
     const handleDeleteEvent = () => {
         console.log(`Deleting event with ID: ${selectedEventId}`)
-        // In a real app, you would make an API call here
         setDeleteDialogOpen(false)
         setSelectedEventId(null)
     }
 
-    // Format date for display
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr)
         return date.toLocaleDateString("en-US", {
@@ -207,23 +128,13 @@ export default function ManageEvents() {
         })
     }
 
-    // Get status badge
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case "upcoming":
-                return <Badge className="bg-primary">Upcoming</Badge>
-            case "ongoing":
-                return <Badge className="bg-green-500">Ongoing</Badge>
-            case "completed":
-                return (
-                    <Badge variant="outline" className="text-muted-foreground">
-                        Completed
-                    </Badge>
-                )
-            case "cancelled":
-                return <Badge variant="destructive">Cancelled</Badge>
-            default:
-                return <Badge variant="outline">{status}</Badge>
+            case "upcoming": return <Badge className="bg-primary">Upcoming</Badge>
+            case "ongoing": return <Badge className="bg-green-500">Ongoing</Badge>
+            case "completed": return <Badge variant="outline" className="text-muted-foreground">Completed</Badge>
+            case "cancelled": return <Badge variant="destructive">Cancelled</Badge>
+            default: return <Badge variant="outline">{status}</Badge>
         }
     }
 

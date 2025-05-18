@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import axios from "axios"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -18,62 +19,13 @@ interface Member {
     status: "active" | "inactive"
 }
 
-// Mock data - replace with API call
-const mockMembers: Member[] = [
-    {
-        id: 1,
-        name: "Ali Ahmed",
-        email: "ali.ahmed@example.com",
-        societies: ["Computing Society", "ACM Chapter"],
-        role: "president",
-        joinDate: "2023-09-01",
-        status: "active"
-    },
-    {
-        id: 2,
-        name: "Sara Khan",
-        email: "sara.khan@example.com",
-        societies: ["Cultural Society"],
-        role: "executive",
-        joinDate: "2023-09-15",
-        status: "active"
-    },
-    {
-        id: 3,
-        name: "Usman Ali",
-        email: "usman.ali@example.com",
-        societies: ["Computing Society", "IEEE Chapter"],
-        role: "member",
-        joinDate: "2023-10-01",
-        status: "active"
-    },
-    {
-        id: 4,
-        name: "Fatima Hassan",
-        email: "fatima.h@example.com",
-        societies: ["Cultural Society", "Literary Society"],
-        role: "executive",
-        joinDate: "2023-08-20",
-        status: "active"
-    },
-    {
-        id: 5,
-        name: "Omar Malik",
-        email: "omar.m@example.com",
-        societies: ["Sports Society"],
-        role: "member",
-        joinDate: "2023-11-05",
-        status: "inactive"
-    }
-]
-
 function RoleBadge({ role }: { role: Member["role"] }) {
     const variants = {
         president: "bg-purple-500",
         executive: "bg-blue-500",
         member: "bg-green-500"
     }
-    
+
     return (
         <Badge className={`${variants[role]} text-white`}>
             {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -86,7 +38,7 @@ function StatusBadge({ status }: { status: Member["status"] }) {
         active: "bg-green-500",
         inactive: "bg-gray-500"
     }
-    
+
     return (
         <Badge className={`${variants[status]} text-white`}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -95,25 +47,37 @@ function StatusBadge({ status }: { status: Member["status"] }) {
 }
 
 export default function Members() {
+    const [members, setMembers] = useState<Member[]>([])
     const [searchTerm, setSearchTerm] = useState("")
     const [societyFilter, setSocietyFilter] = useState("all")
     const [roleFilter, setRoleFilter] = useState("all")
 
-    // Get unique societies from members for filter dropdown
-    const societies = Array.from(new Set(mockMembers.flatMap(member => member.societies)))
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const res = await axios.get("http://localhost:8080/api/members")
+                setMembers(res.data)
+            } catch (err) {
+                console.error("Failed to fetch members", err)
+            }
+        }
+        fetchMembers()
+    }, [])
 
-    const filteredMembers = mockMembers.filter(member => {
-        const matchesSearch = 
+    const societies = Array.from(new Set(members.flatMap(member => member.societies)))
+
+    const filteredMembers = members.filter(member => {
+        const matchesSearch =
             member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            member.societies.some(society => 
+            member.societies.some(society =>
                 society.toLowerCase().includes(searchTerm.toLowerCase())
             )
 
-        const matchesSociety = societyFilter === "all" || 
+        const matchesSociety = societyFilter === "all" ||
             member.societies.includes(societyFilter)
 
-        const matchesRole = roleFilter === "all" || 
+        const matchesRole = roleFilter === "all" ||
             member.role === roleFilter
 
         return matchesSearch && matchesSociety && matchesRole
@@ -225,4 +189,4 @@ export default function Members() {
             </Card>
         </div>
     )
-} 
+}

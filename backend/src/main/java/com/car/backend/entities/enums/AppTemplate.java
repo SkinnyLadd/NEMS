@@ -3,7 +3,7 @@ package com.car.backend.entities.enums;
 public enum AppTemplate {
     SOCIETY_MEMBER("Society Member"),
     EVENT_OC("Event OC"),
-    PARTICIPANT("Participant");
+    PARTICIPATION("Participation");
 
     private final String template;
 

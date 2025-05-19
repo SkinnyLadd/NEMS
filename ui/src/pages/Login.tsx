@@ -4,17 +4,28 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AtSign, Lock, LogIn } from 'lucide-react'
 import Logo from "@/assets/NEMSlogo.svg"
+import {useAuth} from "@/context/AuthContext.tsx";
+
+
 
 export default function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
     const navigate = useNavigate()
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const { login, loading } = useAuth()
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // Navigate directly to dashboard for testing
-        navigate("/dashboard")
+        try {
+            await login(email, password)
+            navigate("/dashboard")
+        } catch (err) {
+            alert("Login failed")
+        }
     }
+
 
     return (
         <div className="flex min-h-screen min-w-screen items-center justify-center bg-primary/5">
@@ -26,6 +37,12 @@ export default function Login() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                        <div className="rounded bg-red-100 p-2 text-sm text-red-700">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="space-y-2">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email

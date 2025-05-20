@@ -1,19 +1,22 @@
 package com.car.backend.entities.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum Batch {
-    //rich enum
-    FRESHMAN("Freshman"),
-    SOPHOMORE("Sophomore"),
-    JUNIOR("Junior"),
-    SENIOR("Senior"),
-    ALUMNI("Alumni");
+    FRESHMAN,
+    SOPHOMORE,
+    JUNIOR,
+    SENIOR,
+    ALUMNI;
 
-    private final String batch;
-    Batch(String batch) {
-        this.batch = batch;
-    }
-    public String getBatch() {
-        return batch;
+    @JsonCreator
+    public static Batch fromString(String key) {
+        return key == null ? null : Batch.valueOf(key.toUpperCase());
     }
 
+    @JsonValue
+    public String toValue() {
+        return this.name();
+    }
 }

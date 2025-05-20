@@ -1,13 +1,23 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AtSign, User, Hash, BookOpen, GraduationCap, UserPlus, Lock } from "lucide-react"
+
+import {
+    AtSign,
+    User,
+    Hash,
+    BookOpen,
+    GraduationCap,
+    UserPlus,
+    Lock,
+} from "lucide-react"
+
 import Logo from "@/assets/NEMSlogo.svg"
 
 export default function Signup() {
@@ -20,7 +30,29 @@ export default function Signup() {
         batch: "",
         department: "",
     })
+
+    const [courses, setCourses] = useState<string[]>([])
+    const [error, setError] = useState<string>("")
     const navigate = useNavigate()
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const res = await axios.get("http://localhost:8080/api/courses")
+                const courseList = Array.isArray(res.data)
+                    ? res.data.map((course: any) => course.courseName)
+                    : [];
+                console.log("Fetched courses:", courseList);
+                setCourses(courseList);
+            } catch (err) {
+                console.error("Failed to fetch courses", err)
+            }
+        }
+
+        fetchCourses()
+    }, [])
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
@@ -31,10 +63,23 @@ export default function Signup() {
         setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // Navigate to login page
-        navigate("/login")
+        setError("")
+
+        try {
+            const res = await axios.post("http://localhost:8080/api/users", formData)
+
+            if (res.status === 201) {
+                navigate("/login")
+            }
+        } catch (err: any) {
+            if (err.response?.status === 409) {
+                setError(err.response.data.message)
+            } else {
+                setError("Something went wrong. Please try again.")
+            }
+        }
     }
 
     return (
@@ -48,151 +93,80 @@ export default function Signup() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                                First Name
-                            </label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                                <Input
-                                    id="firstName"
-                                    placeholder="Ali"
-                                    className="h-12 pl-10 text-base"
-                                    value={formData.firstName}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                                Last Name
-                            </label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                                <Input
-                                    id="lastName"
-                                    placeholder="Azmat"
-                                    className="h-12 pl-10 text-base"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+                        <InputField
+                            id="firstName"
+                            label="First Name"
+                            icon={User}
+                            placeholder="Ali"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                        />
+                        <InputField
+                            id="lastName"
+                            label="Last Name"
+                            icon={User}
+                            placeholder="Azmat"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <label htmlFor="cms" className="block text-sm font-medium text-gray-700">
-                                CMS (6-digit Roll Number)
-                            </label>
-                            <div className="relative">
-                                <Hash className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                                <Input
-                                    id="cms"
-                                    placeholder="123456"
-                                    className="h-12 pl-10 text-base"
-                                    value={formData.cms}
-                                    onChange={handleChange}
-                                    maxLength={6}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email
-                            </label>
-                            <div className="relative">
-                                <AtSign className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    className="h-12 pl-10 text-base"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+                        <InputField
+                            id="cms"
+                            label="CMS (6-digit Roll Number)"
+                            icon={Hash}
+                            placeholder="123456"
+                            value={formData.cms}
+                            onChange={handleChange}
+                            maxLength={6}
+                        />
+                        <InputField
+                            id="email"
+                            label="Email"
+                            icon={AtSign}
+                            placeholder="you@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            type="email"
+                        />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                            Password
-                        </label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                            <Input
-                                id="password"
-                                type="password"
-                                placeholder="••••••••"
-                                className="h-12 pl-10 text-base"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
+                    <InputField
+                        id="password"
+                        label="Password"
+                        icon={Lock}
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleChange}
+                        type="password"
+                    />
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <label htmlFor="batch" className="block text-sm font-medium text-gray-700">
-                                Batch
-                            </label>
-                            <Select onValueChange={(value) => handleSelectChange("batch", value)}>
-                                <SelectTrigger id="batch" className="h-12">
-                                    <div className="flex items-center">
-                                        <GraduationCap className="mr-2 h-5 w-5 text-gray-400" />
-                                        <SelectValue placeholder="Select Batch" />
-                                    </div>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="2021">2021</SelectItem>
-                                    <SelectItem value="2022">2022</SelectItem>
-                                    <SelectItem value="2023">2023</SelectItem>
-                                    <SelectItem value="2024">2024</SelectItem>
-                                    <SelectItem value="2025">2025</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                                Department
-                            </label>
-                            <Select onValueChange={(value) => handleSelectChange("department", value)}>
-                                <SelectTrigger id="department" className="h-12">
-                                    <div className="flex items-center">
-                                        <BookOpen className="mr-2 h-5 w-5 text-gray-400" />
-                                        <SelectValue placeholder="Select Department" />
-                                    </div>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="BS CS">BS CS</SelectItem>
-                                    <SelectItem value="BS AI">BS AI</SelectItem>
-                                    <SelectItem value="BE EE">BE EE</SelectItem>
-                                    <SelectItem value="BS DS">BS DS</SelectItem>
-                                    <SelectItem value="BE SE">BE SE</SelectItem>
-                                    <SelectItem value="BBA">BBA</SelectItem>
-                                    <SelectItem value="ACF">ACF</SelectItem>
-                                    <SelectItem value="ARCHI">ARCHI</SelectItem>
-                                    <SelectItem value="ECON">ECON</SelectItem>
-                                    <SelectItem value="BE ME">BE ME</SelectItem>
-                                    <SelectItem value="BE AE">BE AE</SelectItem>
-                                    <SelectItem value="BS PSYCH">BS PSYCH</SelectItem>
-                                    <SelectItem value="BIO INFORMATICS">BIO INFORMATICS</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <SelectField
+                            id="batch"
+                            label="Batch"
+                            icon={GraduationCap}
+                            options={["FRESHMAN", "SOPHOMORE", "JUNIOR", "SENIOR"]}
+                            value={formData.batch}
+                            onChange={(val) => handleSelectChange("batch", val)}
+                        />
+                        <SelectField
+                            id="department"
+                            label="Department"
+                            icon={BookOpen}
+                            options={courses}
+                            value={formData.department}
+                            onChange={(val) => handleSelectChange("department", val)}
+                        />
                     </div>
 
-                    <Button
-                        type="submit"
-                        className="h-12 w-full bg-white text-primary text-base font-semibold hover:bg-primary/90"
-                    >
+                    <Button type="submit" className="h-12 w-full bg-white text-primary text-base font-semibold hover:bg-primary/90">
                         <UserPlus className="mr-2 h-5 w-5" />
                         Create Account
                     </Button>
+
+                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                 </form>
 
                 <div className="mt-8 text-center">
@@ -208,3 +182,83 @@ export default function Signup() {
     )
 }
 
+// Reusable input field component
+function InputField({
+                        id,
+                        label,
+                        icon: Icon,
+                        placeholder,
+                        value,
+                        onChange,
+                        type = "text",
+                        maxLength,
+                    }: {
+    id: string
+    label: string
+    icon: React.ElementType
+    placeholder: string
+    value: string
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    type?: string
+    maxLength?: number
+}) {
+    return (
+        <div className="space-y-2">
+            <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+                {label}
+            </label>
+            <div className="relative">
+                <Icon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <Input
+                    id={id}
+                    type={type}
+                    placeholder={placeholder}
+                    className="h-12 pl-10 text-base"
+                    value={value}
+                    onChange={onChange}
+                    maxLength={maxLength}
+                />
+            </div>
+        </div>
+    )
+}
+
+// Reusable select field component
+function SelectField({
+                         id,
+                         label,
+                         icon: Icon,
+                         options,
+                         value,
+                         onChange,
+                     }: {
+    id: string
+    label: string
+    icon: React.ElementType
+    options: string[]
+    value: string
+    onChange: (value: string) => void
+}) {
+    return (
+        <div className="space-y-2">
+            <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+                {label}
+            </label>
+            <Select onValueChange={onChange} value={value}>
+                <SelectTrigger id={id} className="h-12">
+                    <div className="flex items-center">
+                        <Icon className="mr-2 h-5 w-5 text-gray-400" />
+                        <SelectValue placeholder={`Select ${label}`} />
+                    </div>
+                </SelectTrigger>
+                <SelectContent className="max-h-60 overflow-y-auto">
+                    {options.map((option) => (
+                        <SelectItem key={option} value={option}>
+                            {option}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    )
+}

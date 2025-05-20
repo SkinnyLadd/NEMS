@@ -27,10 +27,12 @@ public class Course {
 
     @Column(name = "course_name", nullable = false, length = Integer.MAX_VALUE)
     private String courseName;
+
+
     @OneToMany(mappedBy = "course")
     private Set<User> users = new LinkedHashSet<>();
 
-    @Column(name = "school", columnDefinition = "school_enum not null")
+    @Column(name = "school", columnDefinition = "school_enum")
     @Enumerated(EnumType.STRING)
     private School school;
 

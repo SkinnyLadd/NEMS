@@ -1,6 +1,7 @@
 package com.car.backend.controllers;
 
 import com.car.backend.DTO.UserDTO;
+import com.car.backend.DTO.CreateUserDTO;
 import com.car.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin
 public class UserController {
 
     @Autowired
@@ -29,8 +31,13 @@ public class UserController {
         return service.getUserByEmail(email);
     }
 
+    @GetMapping
+    public List<UserDTO> getUsers() {
+        return service.getAllUsers();
+    }
+
     @PostMapping
-    public UserDTO saveUser(@RequestBody UserDTO dto) {
-        return service.saveUser(dto);
+    public UserDTO createUser(@RequestBody CreateUserDTO dto) {
+        return service.createUser(dto);
     }
 }

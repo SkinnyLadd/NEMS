@@ -21,6 +21,12 @@ public class SocietyService {
                 .collect(Collectors.toList());
     }
 
+    public List<SocietyDTO> getAllSocieties() {
+        return repository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     public SocietyDTO saveSociety(SocietyDTO dto) {
         Society entity = convertToEntity(dto);
         Society savedEntity = repository.save(entity);
@@ -42,4 +48,10 @@ public class SocietyService {
         entity.setDescription(dto.getDescription());
         return entity;
     }
+
+//    public List<SocietyDTO> getSocietiesBySocId(Integer id) {
+//        return repository.findBySocId(id).stream()
+//                .map(this::convertToDTO)
+//                .collect(Collectors.toList());
+//    }
 }

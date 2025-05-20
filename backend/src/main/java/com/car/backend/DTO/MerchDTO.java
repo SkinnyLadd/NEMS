@@ -14,4 +14,7 @@ public class MerchDTO {
     private Integer availableUnits;
     private MerchType merchType;
     private MerchSize merchSize;
+
+    private EventDTO eventDTO;
+
 }

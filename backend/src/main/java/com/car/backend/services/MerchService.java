@@ -1,5 +1,6 @@
 package com.car.backend.services;
 
+import com.car.backend.DTO.EventDTO;
 import com.car.backend.DTO.MerchDTO;
 import com.car.backend.entities.Merch;
 import com.car.backend.entities.enums.MerchType;
@@ -40,6 +41,7 @@ public class MerchService {
         return convertToDTO(savedEntity);
     }
 
+
     private MerchDTO convertToDTO(Merch entity) {
         MerchDTO dto = new MerchDTO();
         dto.setId(entity.getId());
@@ -50,6 +52,15 @@ public class MerchService {
         dto.setAvailableUnits(entity.getAvailableUnits());
         dto.setMerchType(entity.getMerchType());
         dto.setMerchSize(entity.getMerchSize());
+
+        // Include event details if present
+        if (entity.getEvent() != null) {
+            EventDTO eventDTO = new EventDTO();
+            eventDTO.setId(entity.getEvent().getId());
+            eventDTO.setTitle(entity.getEvent().getTitle()); // Assumes `getTitle()` exists
+            dto.setEventDTO(eventDTO);
+        }
+
         return dto;
     }
 
@@ -64,5 +75,11 @@ public class MerchService {
         entity.setMerchType(dto.getMerchType());
         entity.setMerchSize(dto.getMerchSize());
         return entity;
+    }
+
+    public List<MerchDTO> getAllMerch() {
+        return repository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }

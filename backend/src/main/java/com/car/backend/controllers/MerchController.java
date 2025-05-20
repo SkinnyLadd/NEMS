@@ -14,6 +14,11 @@ public class MerchController {
     @Autowired
     private MerchService service;
 
+    @GetMapping
+    public List<MerchDTO> getAllMerch() {
+        return service.getAllMerch();
+    }
+
     @GetMapping("/search")
     public List<MerchDTO> getMerchByName(@RequestParam String merchName) {
         return service.getMerchByName(merchName);

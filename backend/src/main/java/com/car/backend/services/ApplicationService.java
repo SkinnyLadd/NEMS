@@ -2,6 +2,7 @@ package com.car.backend.services;
 
 import com.car.backend.DTO.ApplicationDTO;
 import com.car.backend.entities.Application;
+import com.car.backend.repositories.ApplicationAnswerRepository;
 import com.car.backend.repositories.ApplicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,45 +15,46 @@ import java.util.stream.Collectors;
 public class ApplicationService {
 
     @Autowired
-    private ApplicationRepository applicationRepository;
+    private ApplicationRepository applicationRepo;
 
-    public List<ApplicationDTO> getApplicationsByStatus(AppStatus status) {
-        List<Application> applications = applicationRepository.findByStatus(status);
-        return applications.stream().map(this::convertToDTO).collect(Collectors.toList());
+    @Autowired
+    private ApplicationAnswerRepository answerRepo;
+
+    public List<ApplicationDTO> getAllApplications() {
+        List<Application> apps = applicationRepo.findAllWithEventAndUser();
+        return apps.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public List<ApplicationDTO> getApplicationsByApplicantId(Integer applicantId) {
-        List<Application> applications = applicationRepository.findByApplicantId(applicantId);
-        return applications.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public void updateApplicationStatus(int id, String newStatus) {
+        Application app = applicationRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+        app.setStatus(AppStatus.valueOf(newStatus));
+        applicationRepo.save(app);
     }
 
-    public List<ApplicationDTO> getApplicationsByTemplateId(Integer templateId) {
-        List<Application> applications = applicationRepository.findByTemplateId(templateId);
-        return applications.stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    public ApplicationDTO saveApplication(ApplicationDTO applicationDTO) {
-        Application application = convertToEntity(applicationDTO);
-        Application savedApplication = applicationRepository.save(application);
-        return convertToDTO(savedApplication);
-    }
-
-    private ApplicationDTO convertToDTO(Application application) {
+    private ApplicationDTO toDTO(Application app) {
         ApplicationDTO dto = new ApplicationDTO();
-        dto.setId(application.getId());
-        dto.setTemplateId(application.getTemplate().getId());
-        dto.setApplicantId(application.getApplicant().getId());
-        dto.setCreatedAt(application.getCreatedAt());
-        dto.setStatus(application.getStatus());
-        return dto;
-    }
+        dto.setId(app.getId());
+        dto.setEventTitle(app.getTemplate().getName());
+        dto.setStatus(app.getStatus().name());
+        dto.setAppliedAt(app.getCreatedAt().toString());
 
-    private Application convertToEntity(ApplicationDTO dto) {
-        Application application = new Application();
-        application.setId(dto.getId());
-        // Set template and applicant using their respective services or repositories
-        application.setCreatedAt(dto.getCreatedAt());
-        application.setStatus(dto.getStatus());
-        return application;
+        ApplicationDTO.ApplicantInfo applicant = new ApplicationDTO.ApplicantInfo();
+        applicant.setName(app.getApplicant().getFirstName() + " " + app.getApplicant().getLastName());
+        applicant.setEmail(app.getApplicant().getEmail());
+        applicant.setRegNo(String.valueOf(app.getApplicant().getCms()));
+        dto.setApplicant(applicant);
+
+        List<ApplicationDTO.AnswerDTO> answers = answerRepo.findByApplicationId(app.getId()).stream()
+                .map(answer -> {
+                    ApplicationDTO.AnswerDTO a = new ApplicationDTO.AnswerDTO();
+                    a.setQuestionId(answer.getQuestion().getId());
+                    a.setQuestion(answer.getQuestion().getQuestionText());
+                    a.setAnswer(answer.getAnswerText());
+                    return a;
+                }).toList();
+
+        dto.setAnswers(answers);
+        return dto;
     }
 }

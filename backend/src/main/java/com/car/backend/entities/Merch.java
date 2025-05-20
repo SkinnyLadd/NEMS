@@ -3,6 +3,7 @@ package com.car.backend.entities;
 import com.car.backend.entities.enums.MerchSize;
 import com.car.backend.entities.enums.MerchType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -46,5 +47,10 @@ public class Merch {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "event_id")
     private Event event;
+
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "merch_price", nullable = false)
+    private Integer merchPrice;
 
 }

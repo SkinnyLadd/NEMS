@@ -4,6 +4,7 @@ import com.car.backend.DTO.TicketDTO;
 import com.car.backend.entities.Ticket;
 import com.car.backend.entities.enums.TicketType;
 import com.car.backend.repositories.TicketRepository;
+import com.car.backend.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class TicketService {
         dto.setId(entity.getId());
         dto.setEventId(entity.getEvent().getId());
         dto.setAvailableTickets(entity.getAvailableTickets());
-        dto.setTicketType(entity.getTicketType());
+        dto.setTicketType(String.valueOf(entity.getTicketType()));
         return dto;
     }
 
@@ -48,7 +49,7 @@ public class TicketService {
         entity.setId(dto.getId());
         // Set event entity as needed
         entity.setAvailableTickets(dto.getAvailableTickets());
-        entity.setTicketType(dto.getTicketType());
+        entity.setTicketType(EnumUtils.parseTicketType(dto.getTicketType()));
         return entity;
     }
 }

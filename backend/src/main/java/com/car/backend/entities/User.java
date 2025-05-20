@@ -82,9 +82,13 @@ public class User {
     private Set<Volunteer> volunteers = new LinkedHashSet<>();
 
 
-    @Column(name = "batch", columnDefinition = "batch_enum not null")
+    @Column(name = "batch", columnDefinition = "batch_enum")
     @Enumerated(EnumType.STRING)
     private Batch batch;
+
+    public String getName() {
+        return firstName + " " + lastName;
+    }
 
 
 

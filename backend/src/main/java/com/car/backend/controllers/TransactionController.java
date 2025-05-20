@@ -14,6 +14,11 @@ public class TransactionController {
     @Autowired
     private TransactionService service;
 
+    @GetMapping
+    public List<TransactionDTO> getAllTransactions() {
+        return service.getAllTransactions();
+    }
+
     @GetMapping("/user/{userId}")
     public List<TransactionDTO> getTransactionsByUserId(@PathVariable Integer userId) {
         return service.getTransactionsByUserId(userId);

@@ -1,67 +1,28 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, ShoppingCart, Filter } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import {useEffect, useState} from "react"
+import {Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {Search, ShoppingCart, Filter} from "lucide-react"
+import {useNavigate} from "react-router-dom"
+import axios from "axios" // make sure you have this installed
 
 interface MerchItem {
     id: number
-    name: string
-    description: string
-    price: number
-    sizes: string[]
+    merchName: string
+    merchDescription: string
+    merchPurchaseable: boolean
+    totalUnits: number
     availableUnits: number
-    event?: {
-        id: number
-        title: string
-    }
-    imageUrl: string
+    merchType: string
+    merchSize: string
+    eventId?: number
+    // You can also include event title if needed in the DTO later
 }
 
-// Mock data - replace with API call
-const mockMerch: MerchItem[] = [
-    {
-        id: 1,
-        name: "Tech Conference Hoodie",
-        description: "Premium quality hoodie with the Tech Conference 2024 logo.",
-        price: 2500,
-        sizes: ["S", "M", "L", "XL"],
-        availableUnits: 100,
-        event: {
-            id: 1,
-            title: "Tech Conference 2024"
-        },
-        imageUrl: "/placeholder-hoodie.jpg"
-    },
-    {
-        id: 2,
-        name: "Cultural Night T-Shirt",
-        description: "Comfortable cotton t-shirt featuring Cultural Night artwork.",
-        price: 1200,
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        availableUnits: 150,
-        event: {
-            id: 2,
-            title: "Cultural Night"
-        },
-        imageUrl: "/placeholder-tshirt.jpg"
-    },
-    {
-        id: 3,
-        name: "NUST Sweatshirt",
-        description: "Classic NUST branded sweatshirt, perfect for any occasion.",
-        price: 2000,
-        sizes: ["S", "M", "L", "XL"],
-        availableUnits: 75,
-        imageUrl: "/placeholder-sweatshirt.jpg"
-    }
-]
-
-function MerchCard({ item }: { item: MerchItem }) {
+function MerchCard({item}: { item: MerchItem }) {
     const navigate = useNavigate()
 
     const handleBuyMerch = () => {
@@ -71,26 +32,22 @@ function MerchCard({ item }: { item: MerchItem }) {
     return (
         <Card className="overflow-hidden">
             <div className="aspect-square relative">
-                <img 
-                    src={item.imageUrl} 
-                    alt={item.name}
+                <img
+                    src={`/merch-images/${item.id}.jpg`} // dynamic image logic (adjust as needed)
+                    alt={item.merchName}
                     className="object-cover w-full h-full"
                     onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.src = "https://via.placeholder.com/400?text=Merch+Image"
                     }}
                 />
-                {item.event && (
-                    <div className="absolute top-2 right-2 bg-primary/90 text-white px-2 py-1 rounded-full text-sm">
-                        {item.event.title}
-                    </div>
-                )}
             </div>
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div>
-                        <CardTitle className="text-xl">{item.name}</CardTitle>
-                        <CardDescription className="mt-2">Rs. {item.price}</CardDescription>
+                        <CardTitle className="text-xl">{item.merchName}</CardTitle>
+                        <CardDescription
+                            className="mt-2">{item.merchPurchaseable ? "Available for Purchase" : "Not Purchaseable"}</CardDescription>
                     </div>
                     <div className="text-sm text-muted-foreground">
                         {item.availableUnits} available
@@ -98,14 +55,15 @@ function MerchCard({ item }: { item: MerchItem }) {
                 </div>
             </CardHeader>
             <CardContent>
-                <p className="text-muted-foreground">{item.description}</p>
+                <p className="text-muted-foreground">{item.merchDescription}</p>
             </CardContent>
             <CardFooter>
-                <Button 
+                <Button
                     onClick={handleBuyMerch}
                     className="w-full text-primary"
+                    disabled={!item.merchPurchaseable}
                 >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    <ShoppingCart className="mr-2 h-4 w-4"/>
                     Buy Now
                 </Button>
             </CardFooter>
@@ -116,16 +74,30 @@ function MerchCard({ item }: { item: MerchItem }) {
 export default function BuyMerch() {
     const [searchTerm, setSearchTerm] = useState("")
     const [filter, setFilter] = useState("all")
+    const [merch, setMerch] = useState<MerchItem[]>([])
 
-    const filteredMerch = mockMerch.filter(item => {
-        const matchesSearch = 
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (item.event?.title.toLowerCase() || "").includes(searchTerm.toLowerCase())
+    useEffect(() => {
+        axios.get<MerchItem[]>("http://localhost:8080/api/merch")
+            .then((response) => {
+                // Map event object to eventId
+                const mapped = response.data.map(item => ({
+                    ...item,
+                    eventId: item.event?.id ?? undefined
+                }))
+                setMerch(mapped)
+            })
+            .catch((error) => {
+                console.error("Error fetching merch:", error)
+            })
+    }, [])
+    const filteredMerch = merch.filter(item => {
+        const matchesSearch =
+            item.merchName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.merchDescription.toLowerCase().includes(searchTerm.toLowerCase())
 
         if (filter === "all") return matchesSearch
-        if (filter === "event") return matchesSearch && item.event
-        if (filter === "general") return matchesSearch && !item.event
+        if (filter === "event") return matchesSearch && item.eventId
+        if (filter === "general") return matchesSearch && !item.eventId
         return matchesSearch
     })
 
@@ -170,4 +142,4 @@ export default function BuyMerch() {
             )}
         </div>
     )
-} 
+}

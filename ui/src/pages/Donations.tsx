@@ -1,79 +1,92 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, Filter, Heart, TrendingUp } from "lucide-react"
 
+import axios from "axios"
+
 interface Donation {
     id: number
     donor: {
         name: string
         regNo?: string
-        type: "student" | "alumni" | "other"
+        type: "student" | "other"
     }
-    society: string
+    event?: {
+        id: number
+        name: string
+        society?: string
+    } | null
     amount: number
     date: string
     message?: string
 }
 
-// Mock data - replace with API call
-const mockDonations: Donation[] = [
-    {
-        id: 1,
-        donor: {
-            name: "Ahmed Khan",
-            regNo: "123456",
-            type: "student"
-        },
-        society: "Computing Society",
-        amount: 5000,
-        date: "2024-03-15",
-        message: "Keep up the great work!"
-    },
-    {
-        id: 2,
-        donor: {
-            name: "Sara Ali",
-            type: "alumni"
-        },
-        society: "Cultural Society",
-        amount: 10000,
-        date: "2024-03-10",
-        message: "Supporting cultural activities"
-    },
-    {
-        id: 3,
-        donor: {
-            name: "Anonymous",
-            type: "other"
-        },
-        society: "Computing Society",
-        amount: 15000,
-        date: "2024-03-05"
-    }
-]
-
 export default function Donations() {
+    const [donations, setDonations] = useState<Donation[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
     const [searchTerm, setSearchTerm] = useState("")
-    const [societyFilter, setSocietyFilter] = useState("all")
+    const [eventFilter, setEventFilter] = useState("all")
 
-    const filteredDonations = mockDonations.filter(donation => {
-        const matchesSearch = 
-            donation.donor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            ((donation.donor.regNo?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-            (donation.message?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false))
 
-        const matchesSociety = societyFilter === "all" || donation.society === societyFilter
+    // Fetch donations from API endpoint
+    useEffect(() => {
+        async function fetchDonations() {
+            try {
+                setLoading(true)
+                setError(null)
 
-        return matchesSearch && matchesSociety
+                const res = await axios.get<Donation[]>("http://localhost:8080/api/donations")
+                setDonations(res.data)
+
+            } catch (err) {
+                if (axios.isAxiosError(err)) {
+                    setError(err.response?.data?.message || err.message)
+                } else {
+                    setError("An unknown error occurred")
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchDonations()
+    }, [])
+
+
+
+    // Extract unique events for filter dropdown ("General" included)
+    const eventNames = Array.from(
+        new Set(
+            Array.isArray(donations) ? donations.map(d => (d.event ? d.event.name : "General")) : []
+        )
+    )
+
+    const safeDonations = Array.isArray(donations) ? donations : []
+
+    // Filter donations by search and event
+    const filteredDonations = safeDonations.filter(donation => {
+        const lowerSearch = searchTerm.toLowerCase()
+        const matchesSearch =
+            donation.donor.name.toLowerCase().includes(lowerSearch) ||
+            (donation.donor.regNo?.toLowerCase().includes(lowerSearch) ?? false) // ||
+            // (donation.message?.toLowerCase().includes(lowerSearch) ?? false)
+
+        const donationEventName = donation.event ? donation.event.name : "General"
+        const matchesEvent = eventFilter === "all" || donationEventName === eventFilter
+
+        return matchesSearch && matchesEvent
     })
 
-    // Calculate statistics
+    // Calculate stats
     const totalDonations = filteredDonations.reduce((sum, d) => sum + d.amount, 0)
     const averageDonation = totalDonations / filteredDonations.length || 0
-    const societies = Array.from(new Set(mockDonations.map(d => d.society)))
+
+    if (loading) return <div>Loading donations...</div>
+    if (error) return <div className="text-red-600">Error: {error}</div>
 
     return (
         <div className="container mx-auto py-8 px-4">
@@ -81,7 +94,7 @@ export default function Donations() {
                 <div>
                     <h1 className="text-3xl font-bold">Donations</h1>
                     <p className="text-muted-foreground mt-1">
-                        Track and manage society donations
+                        Track and manage event donations
                     </p>
                 </div>
 
@@ -95,16 +108,17 @@ export default function Donations() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <Select value={societyFilter} onValueChange={setSocietyFilter}>
+
+                    <Select value={eventFilter} onValueChange={setEventFilter}>
                         <SelectTrigger className="w-[200px]">
                             <Filter className="mr-2 h-4 w-4" />
-                            <SelectValue placeholder="Filter by Society" />
+                            <SelectValue placeholder="Filter by Event" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Societies</SelectItem>
-                            {societies.map(society => (
-                                <SelectItem key={society} value={society}>
-                                    {society}
+                            <SelectItem value="all">All Events</SelectItem>
+                            {eventNames.map(eventName => (
+                                <SelectItem key={eventName} value={eventName}>
+                                    {eventName}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -146,6 +160,7 @@ export default function Donations() {
                 </Card>
             </div>
 
+
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -158,10 +173,11 @@ export default function Donations() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Donor</TableHead>
+                                <TableHead>Event</TableHead>
                                 <TableHead>Society</TableHead>
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Date</TableHead>
-                                <TableHead>Message</TableHead>
+                                {/*<TableHead>Message</TableHead>*/}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -180,12 +196,13 @@ export default function Donations() {
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell>{donation.society}</TableCell>
+                                    <TableCell>{donation.event ? donation.event.name : "General"}</TableCell>
+                                    <TableCell>{donation.event?.society || "-"}</TableCell>
                                     <TableCell>Rs. {donation.amount.toLocaleString()}</TableCell>
-                                    <TableCell>{donation.date}</TableCell>
-                                    <TableCell className="max-w-[200px] truncate">
-                                        {donation.message || "-"}
-                                    </TableCell>
+                                    <TableCell>{new Date(donation.date).toLocaleDateString()}</TableCell>
+                                    {/*<TableCell className="max-w-[200px] truncate">*/}
+                                    {/*    {donation.message || "-"}*/}
+                                    {/*</TableCell>*/}
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -200,4 +217,4 @@ export default function Donations() {
             </Card>
         </div>
     )
-} 
+}

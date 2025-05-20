@@ -14,4 +14,11 @@ public class TransactionDTO {
     private Integer amount;
     private TransType transType;
     private PaymentMethod paymentMethod;
+    private String item;
+    private String majorEvent;
+    private Integer price;
+    private Integer quantity;
+    private String status;
+    private String type; // "merchandise" | "event" | "module"
+
 }

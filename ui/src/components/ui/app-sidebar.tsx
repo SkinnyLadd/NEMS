@@ -128,14 +128,14 @@ export function AppSidebar() {
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <a href="/ticketing" className="text-primary">
-                                        <Ticket className="h-5 w-5" />
-                                        <span>Manage Tickets</span>
-                                    </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            {/*<SidebarMenuItem>*/}
+                            {/*    <SidebarMenuButton asChild>*/}
+                            {/*        <a href="/ticketing" className="text-primary">*/}
+                            {/*            <Ticket className="h-5 w-5" />*/}
+                            {/*            <span>Manage Tickets</span>*/}
+                            {/*        </a>*/}
+                            {/*    </SidebarMenuButton>*/}
+                            {/*</SidebarMenuItem>*/}
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <a href="/applications" className="text-primary">

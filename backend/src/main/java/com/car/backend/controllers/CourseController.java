@@ -10,18 +10,22 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/courses")
+@CrossOrigin
 public class CourseController {
 
     @Autowired
-    private CourseService service;
+    private CourseService courseService;
 
-    @GetMapping("/school/{school}")
-    public List<CourseDTO> getCoursesBySchool(@PathVariable School school) {
-        return service.getCoursesBySchool(school);
+    @GetMapping
+    public List<CourseDTO> getCourses() {
+        return courseService.getAllCourses();
     }
 
-    @PostMapping
-    public CourseDTO saveCourse(@RequestBody CourseDTO dto) {
-        return service.saveCourse(dto);
+    @GetMapping("/by-school/{school}")
+    public List<CourseDTO> getCoursesBySchool(@PathVariable String school) {
+        return courseService.getCoursesBySchool(school);
     }
+
+
+
 }

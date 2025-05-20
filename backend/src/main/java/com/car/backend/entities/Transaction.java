@@ -3,6 +3,7 @@ package com.car.backend.entities;
 import com.car.backend.entities.enums.PaymentMethod;
 import com.car.backend.entities.enums.TransType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -42,5 +43,18 @@ public class Transaction {
     @Column(name = "payment_method", columnDefinition = "payment_method_enum not null")
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
+
+    @Column(name = "reference_id")
+    private Integer referenceId;
+
+    @Size(max = 50)
+    @Column(name = "reference_type", length = 50)
+    private String referenceType;
+
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "event_id", insertable = false, updatable = false)
+//    private Event event;
+//
+
 
 }

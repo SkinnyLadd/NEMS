@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UserSocietyRepository extends JpaRepository<UserSociety, UserSocietyId> {
+    List<UserSociety> findAll();
     List<UserSociety> findByUserId(Integer userId);
     List<UserSociety> findBySocietyId(Integer societyId);
 }

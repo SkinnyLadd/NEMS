@@ -6,7 +6,8 @@ import lombok.Data;
 @Data
 public class TicketDTO {
     private Integer id;
+    private Long price;
     private Integer eventId;
     private Integer availableTickets;
-    private TicketType ticketType;
+    private String ticketType;
 }

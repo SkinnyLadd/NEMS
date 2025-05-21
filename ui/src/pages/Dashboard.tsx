@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar, Clock } from "lucide-react"
 
 import axios from "axios"
+import { format, subHours } from "date-fns";
 
 interface EventDTO {
     id: number
@@ -46,8 +47,8 @@ export default function DashboardPage() {
     const now = new Date()
 
     const categorizeEvent = (event: EventDTO): "upcoming" | "ongoing" | "completed" => {
-        const start = new Date(event.startTime)
-        const end = new Date(event.endTime)
+        const start = subHours(new Date(event.startTime), 5)
+        const end = subHours(new Date(event.endTime), 5)
 
         if (now < start) return "upcoming"
         if (now >= start && now <= end) return "ongoing"
@@ -70,7 +71,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2">
                     <Button variant="outline">
                         <Calendar className="mr-2 h-4 w-4" />
-                        {new Date().toLocaleDateString("en-US", {
+                        {new Date().toLocaleDateString("en-PK", {
                             month: "long",
                             day: "numeric",
                             year: "numeric",
@@ -181,11 +182,11 @@ function EventCard({ title, date, time, status = "upcoming" }: EventCardProps) {
                 {/*    <Users className="mr-2 h-4 w-4 text-muted-foreground" />*/}
                 {/*    <span>{attendees} attendees</span>*/}
                 {/*</div>*/}
-                <div className="pt-2">
-                    <Button size="sm" variant="outline" className="w-full">
-                        View Details
-                    </Button>
-                </div>
+                {/*<div className="pt-2">*/}
+                {/*    <Button size="sm" variant="outline" className="w-full">*/}
+                {/*        View Details*/}
+                {/*    </Button>*/}
+                {/*</div>*/}
             </CardContent>
         </Card>
     )
@@ -221,8 +222,8 @@ function formatEventDate(startIso: string, endIso: string) {
 }
 
 function formatEventTime(startIso: string, endIso: string) {
-    const start = new Date(startIso)
-    const end = new Date(endIso)
+    const start = subHours(new Date(startIso),5)
+    const end = subHours(new Date(endIso),5)
 
     const options: Intl.DateTimeFormatOptions = {
         hour: "2-digit",

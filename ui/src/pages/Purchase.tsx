@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar, Clock, MapPin, ArrowLeft, CreditCard } from "lucide-react"
+import {subHours} from "date-fns";
 
 interface TicketType {
     ticketType: string
@@ -62,8 +63,8 @@ export default function Purchase() {
         )
     }
 
-    const start = new Date(event.startTime)
-    const end = new Date(event.endTime)
+    const start = subHours(new Date(event.startTime), 5)
+    const end = subHours(new Date(event.endTime), 5)
     const selectedTicket = event.tickets?.find(t => t.ticketType === selectedType)
     const total = selectedTicket ? selectedTicket.ticketPrice * quantity : 0
 
@@ -82,7 +83,7 @@ export default function Purchase() {
                 <Card>
                     <CardHeader>
                         <CardTitle>{event.title}</CardTitle>
-                        <CardDescription>{event.society?.socName || "Unknown Society"}</CardDescription>
+                        <CardDescription>{event.society?.socName || "SEECS"}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-muted-foreground">{event.description}</p>
@@ -95,10 +96,10 @@ export default function Purchase() {
                                 <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
                                 <span>{start.toLocaleTimeString()} - {end.toLocaleTimeString()}</span>
                             </div>
-                            <div className="flex items-center">
-                                <MapPin className="mr-2 h-5 w-5 text-muted-foreground" />
-                                <span>{event.venue}</span>
-                            </div>
+                            {/*<div className="flex items-center">*/}
+                            {/*    <MapPin className="mr-2 h-5 w-5 text-muted-foreground" />*/}
+                            {/*    <span>{event.venue}</span>*/}
+                            {/*</div>*/}
                         </div>
                     </CardContent>
                 </Card>

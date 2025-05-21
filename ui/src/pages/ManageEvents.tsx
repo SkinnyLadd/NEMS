@@ -1,5 +1,6 @@
 "use client"
 
+
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
@@ -38,6 +39,8 @@ import {
     ArrowUpDown,
 } from "lucide-react"
 
+import { format, subHours } from "date-fns";
+
 export default function ManageEvents() {
     const navigate = useNavigate()
     const [events, setEvents] = useState<any[]>([])
@@ -55,20 +58,21 @@ export default function ManageEvents() {
                 const res = await axios.get("http://localhost:8080/api/events")
                 const now = new Date()
                 const transformed = res.data.map((event: any) => {
-                    const start = new Date(event.startTime)
-                    const end = new Date(event.endTime)
+                    const start = subHours(new Date(event.startTime), 5)
+                    const end = subHours(new Date(event.endTime), 5)
                     let status: "upcoming" | "ongoing" | "completed" = "completed"
                     if (now < start) status = "upcoming"
                     else if (now >= start && now <= end) status = "ongoing"
 
+
                     return {
                         id: event.id,
                         title: event.title,
-                        society: event.society?.socName || "Unknown",
+                        society: event.society?.socName,
                         startDate: start.toISOString(),
-                        startTime: start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                        startTime: format(start, "h:mm a"),
                         endDate: end.toISOString(),
-                        endTime: end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                        endTime: format(end, "h:mm a"),
                         venue: event.venue,
                         status,
                         registrations: event.totalRegistrations || 0,
@@ -119,9 +123,11 @@ export default function ManageEvents() {
         setSelectedEventId(null)
     }
 
+
+
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr)
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString("en-PK", {
             year: "numeric",
             month: "short",
             day: "numeric",
@@ -212,8 +218,8 @@ export default function ManageEvents() {
                             </TableHead>
                             <TableHead>
                                 <div className="flex cursor-pointer items-center" onClick={() => toggleSort("society")}>
-                                    Society
-                                    <ArrowUpDown className="ml-2 h-4 w-4" />
+
+                                    {/*{<ArrowUpDown className="ml-2 h-4 w-4" />}*/}
                                 </div>
                             </TableHead>
                             <TableHead>
@@ -222,8 +228,8 @@ export default function ManageEvents() {
                                     <ArrowUpDown className="ml-2 h-4 w-4" />
                                 </div>
                             </TableHead>
-                            <TableHead>Venue</TableHead>
-                            <TableHead>Status</TableHead>
+                            {/*<TableHead>Venue</TableHead>*/}
+                            <TableHead>    Status</TableHead>
                             <TableHead className="text-right">
                                 <div
                                     className="flex cursor-pointer items-center justify-end"
@@ -321,7 +327,7 @@ export default function ManageEvents() {
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Delete Event</DialogTitle>
+                        <DialogTitle>Confirm Delete</DialogTitle>
                         <DialogDescription>
                             Are you sure you want to delete this event? This action cannot be undone.
                         </DialogDescription>
@@ -330,7 +336,19 @@ export default function ManageEvents() {
                         <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
-                        <Button variant="destructive" onClick={handleDeleteEvent}>
+                        <Button
+                            variant="destructive"
+                            onClick={async () => {
+                                try {
+                                    await axios.delete(`http://localhost:8080/api/events/${selectedEventId}`)
+                                    setEvents(events.filter((e) => e.id !== selectedEventId))
+                                    setDeleteDialogOpen(false)
+                                    setSelectedEventId(null)
+                                } catch (err) {
+                                    console.error("Failed to delete event", err)
+                                }
+                            }}
+                        >
                             Delete
                         </Button>
                     </DialogFooter>

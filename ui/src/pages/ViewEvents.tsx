@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar, Clock, MapPin, Users, Tag, Search, Filter } from "lucide-react"
+import {subHours} from "date-fns";
 
 interface TicketType {
     type: string
@@ -63,7 +64,7 @@ function EventCard({ event }: { event: Event }) {
                 <div className="flex justify-between items-start">
                     <div>
                         <CardTitle className="text-2xl mb-2">{event.title}</CardTitle>
-                        <CardDescription className="text-lg">{event.society}</CardDescription>
+                        {/*<CardDescription className="text-lg">{event.society}</CardDescription>*/}
                     </div>
                     <div className="flex gap-2">
                         <Badge variant="outline" className="bg-primary/10">
@@ -86,10 +87,10 @@ function EventCard({ event }: { event: Event }) {
                             <Clock className="mr-2 h-5 w-5 text-muted-foreground" />
                             <span>{event.startTime} - {event.endTime}</span>
                         </div>
-                        <div className="flex items-center">
-                            <MapPin className="mr-2 h-5 w-5 text-muted-foreground" />
-                            <span>{event.venue}</span>
-                        </div>
+                        {/*<div className="flex items-center">*/}
+                        {/*    <MapPin className="mr-2 h-5 w-5 text-muted-foreground" />*/}
+                        {/*    <span>{event.venue}</span>*/}
+                        {/*</div>*/}
                         <div className="flex items-center">
                             <Users className="mr-2 h-5 w-5 text-muted-foreground" />
                             <span>{event.totalRegistrations} {event.type === "recruitment" ? "applications" : "registered"}</span>
@@ -142,8 +143,8 @@ export default function ViewEvents() {
             try {
                 const res = await axios.get("http://localhost:8080/api/events")
                 const transformed = res.data.map((event: any) => {
-                    const start = new Date(event.startTime)
-                    const end = new Date(event.endTime)
+                    const start = subHours(new Date(event.startTime), 5)
+                    const end = subHours(new Date(event.endTime), 5)
                     const now = new Date()
 
                     let status: "upcoming" | "ongoing" | "completed" = "completed"
@@ -156,7 +157,7 @@ export default function ViewEvents() {
                         startTime: start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                         endDate: end.toLocaleDateString(),
                         endTime: end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                        society: event.society?.socName || "Unknown",
+                        society: event.society?.socName || "",
                         type: event.recruitment ? "recruitment" : "regular",
                         status,
                         totalRegistrations: event.totalRegistrations || 0

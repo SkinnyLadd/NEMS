@@ -27,7 +27,7 @@
     - right-clicking on the file and selecting "Add as Maven Project"
   
   That should be all, try building the backend module and running npm run dev in the ui directory through the terminal.  
-  (backend will prob give a build error for now, will have to setup the database (pain) for that to fully work)
+
 
 # GIT HOW-TO
 

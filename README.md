@@ -1,60 +1,141 @@
-# PROJECT SETUP
-  - Make sure you have the following installed:
-    - Node.js (23.11.0) (run `node -v` in terminal to check)
-    - JDK 21 and Java 21 (run `java -version` in terminal to check)   
-  - If missing: [Node.js](https://nodejs.org/dist/v23.11.0/node-v23.11.0-x64.msi) | [JDK 21](https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.msi)
-  
+# NEMS (NUST Event Management System)
 
-  
-  - Clone the repository in optimal directory:
+## Overview
+NEMS is a web-based application designed to streamline event management for societies at NUST. It provides features for managing users, events, and registrations, ensuring a seamless experience for both organizers and attendees.
+
+---
+
+## Features
+
+### User Management
+- **Authentication**: Login and signup functionality with secure password handling.
+- **Role-based Access**: Different roles for users (e.g., Admin, Organizer, Attendee).
+- **Batch and Course Association**: Users are linked to their respective batches and courses.
+
+### Event Management
+- **Event Creation**: Create events with details like title, date, venue, and society association.
+- **Search and Filter**: Search events by title, date range, or society.
+- **Registration Tracking**: Track registrations and ticket sales for events.
+
+### UI/UX
+- **Responsive Design**: Optimized for both desktop and mobile devices.
+- **Interactive Dashboard**: Provides insights into events, registrations, and revenue.
+
+---
+
+## Tech Stack
+
+### Frontend
+- **React**: Component-based UI development.
+- **TypeScript**: Strongly typed JavaScript for better maintainability.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
+
+### Backend
+- **Java**: Core backend logic.
+- **Spring Boot**: Framework for building RESTful APIs.
+- **Maven**: Dependency management and build automation.
+
+### Database
+- **PostgreSQL**: Relational database for storing user, event, and registration data.
+
+### Other Tools
+- **npm**: Package manager for frontend dependencies.
+- **Lucide React**: Icon library for UI components.
+
+---
+
+## Project Structure
+
+```plaintext
+NEMS/
+├── backend/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/car/backend/
+│   │   │   │   ├── controllers/       # REST API controllers
+│   │   │   │   ├── services/          # Business logic
+│   │   │   │   ├── entities/          # Database entities
+│   │   │   │   ├── repositories/      # Data access layer
+│   │   │   │   ├── config/            # Application configuration
+│   │   ├── resources/
+│   │   │   ├── application.properties # Backend configuration
+│   ├── pom.xml                        # Maven configuration
+├── ui/
+│   ├── src/
+│   │   ├── pages/                     # React pages
+│   │   ├── components/                # Reusable UI components
+│   │   ├── context/                   # Context API for state management
+│   │   ├── assets/                    # Static assets (e.g., images)
+│   ├── package.json                   # Frontend dependencies
+│   ├── tailwind.config.js             # Tailwind CSS configuration
+├── README.md                          # Project documentation
+```
+
+## Installation and Usage
+
+### Prerequisites
+- **Node.js**: For running the frontend.
+- **Java 17+**: For running the backend.
+- **PostgreSQL**: Database setup.
+
+---
+
+### Backend Setup
+
+1. Navigate to the `backend` directory:
+
     ```bash
-    git clone https://github.com/SkinnyLadd/NEMS.git
+    cd backend
     ```
-    
-  - Navigate to the ui directory:
+
+2. Configure the database in `application.properties`.
+
+3. Build and run the backend:
+
     ```bash
-    cd NEMS/ui
+    mvn spring-boot:run
     ```
-  - Install the dependencies:
+
+---
+
+### Frontend Setup
+
+1. Navigate to the `ui` directory:
+
+    ```bash
+    cd ui
+    ```
+
+2. Install dependencies:
+
     ```bash
     npm install
     ```
-  
-  - Open the Project Folder (NEMS) in IntelliJ IDEA
-  - IntelliJ should automatically detect the maven module and download dependencies
-  - If it doesn't, you can manually import the maven module by
-    - opening the `pom.xml` file in the backend directory
-    - right-clicking on the file and selecting "Add as Maven Project"
-  
-  That should be all, try building the backend module and running npm run dev in the ui directory through the terminal.  
 
+3. Start the development server:
 
-# GIT HOW-TO
+    ```bash
+    npm run dev
+    ```
 
-  - Once you've done some meaningful work, you can stage your changes:
-    ```bash
-    git add .
-    ```
-    or a specific file: 
-    ```bash
-    git add <filename with path>
-    ```
-  
-    - Commit your changes with a message:
-    ```bash
-    git commit -m "Your commit message here"
-    ```
-      
-  - **IMPORTANT :** Before pushing your changes, make sure to pull the latest changes from the main branch to avoid conflicts:
-    ```bash
-    git pull
-    ```
-    
-  - If there are any merge conflicts, resolve them in IntelliJ . After resolving, stage the changes again
+---
 
-    
-  - Finally, push your changes to the main branch:
-    ```bash
-    git push 
-    ```
-        
+### Access the Application
+
+- Frontend: [http://localhost:5173](http://localhost:5173)  
+- Backend API: [http://localhost:8080/api](http://localhost:8080/api)
+
+---
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Submit a pull request with a detailed description.
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.  
+See the [`LICENSE`](./LICENSE) file for details.
